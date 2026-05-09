@@ -1,0 +1,17 @@
+[project]
+name = "sqlmodel-nexus-template"
+version = "0.1.0"
+description = "sqlmodel-nexus 四阶段开发模板"
+requires-python = ">=3.12"
+dependencies = [
+    "sqlmodel-nexus>=1.6.0",
+    "fastapi",
+    "uvicorn",
+    "sqlmodel",
+    "aiosqlite",
+    "fastmcp>=3.2.4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -564,6 +564,14 @@ uv run uvicorn demo.rpc_fastapi:app --port 8007
 # visit /docs to see routes grouped by service tag
 ```
 
+## Skill (Claude Code)
+
+本项目提供了一个 [Claude Code skill](./skill/) 用于四阶段渐进式开发。使用前创建软链接：
+
+```bash
+ln -s $(pwd)/skill ~/.claude/skills/sqlmodel-nexus-4phase
+```
+
 ## License
 
 MIT License

@@ -1,4 +1,4 @@
-"""RpcVoyager — analyze RPC services and build Tag/Route/SchemaNode/Link graph data.
+"""UseCaseVoyager — analyze UseCase services and build Tag/Route/SchemaNode/Link graph data.
 
 Converts ServiceIntrospector data into the graph data structures
 used by the DOT renderer, following the mapping:
@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from sqlmodel_nexus.rpc.business import RPC_METHODS_ATTR, RpcService  # noqa: F401
-from sqlmodel_nexus.rpc.introspector import ServiceIntrospector
 from sqlmodel_nexus.subset import SUBSET_REFERENCE  # noqa: F401
+from sqlmodel_nexus.use_case.business import USE_CASE_METHODS_ATTR, UseCaseService  # noqa: F401
+from sqlmodel_nexus.use_case.introspector import ServiceIntrospector
 from sqlmodel_nexus.voyager.filter import filter_graph
 from sqlmodel_nexus.voyager.render import Renderer
 from sqlmodel_nexus.voyager.type import (
@@ -34,16 +34,16 @@ from sqlmodel_nexus.voyager.type_helper import (
 )
 
 
-class RpcVoyager:
-    """Analyze RPC services and build graph data structures for DOT rendering.
+class UseCaseVoyager:
+    """Analyze UseCase services and build graph data structures for DOT rendering.
 
     Follows the same pattern as fastapi-voyager's Voyager class, but sources
-    data from RPC service introspection instead of FastAPI route introspection.
+    data from UseCase service introspection instead of FastAPI route introspection.
     """
 
     def __init__(
         self,
-        services: list[type[RpcService]],
+        services: list[type[UseCaseService]],
         *,
         schema: str | None = None,
         schema_field: str | None = None,
@@ -79,7 +79,7 @@ class RpcVoyager:
         self.theme_color = theme_color
 
     def analysis(self) -> None:
-        """Analyze all RPC services and build graph data."""
+        """Analyze all UseCase services and build graph data."""
         schemas: list[type[BaseModel]] = []
 
         for service_cls in self.services:
@@ -89,7 +89,7 @@ class RpcVoyager:
             self.tags.append(tag_obj)
             self.tag_set[tag_id] = tag_obj
 
-            for method_name in getattr(service_cls, RPC_METHODS_ATTR):
+            for method_name in getattr(service_cls, USE_CASE_METHODS_ATTR):
                 route_id = f'{service_name}.{method_name}'
 
                 if self.route_name is not None and route_id != self.route_name:

@@ -1,8 +1,8 @@
-"""create_rpc_voyager — public API for creating RPC voyager visualization.
+"""create_use_case_voyager — public API for creating UseCase voyager visualization.
 
 Creates a FastAPI ASGI sub-application that can be mounted on any
 FastAPI/Starlette app to provide interactive visualization of
-RPC services and ER diagrams.
+UseCase services and ER diagrams.
 """
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from typing import Any, Literal
 from pydantic import BaseModel as PydanticModel
 
 from sqlmodel_nexus.loader.registry import ErManager
-from sqlmodel_nexus.rpc.business import RpcService
+from sqlmodel_nexus.use_case.business import UseCaseService  # noqa: F401
 from sqlmodel_nexus.voyager.type import CoreData, SchemaNode, Tag
 from sqlmodel_nexus.voyager.voyager_context import (
     STATIC_FILES_PATH,
@@ -32,7 +32,7 @@ class OptionParam(PydanticModel):
     swagger_url: str | None = None
     has_er_diagram: bool = False
     enable_pydantic_resolve_meta: bool = False
-    framework_name: str = "RPC API"
+    framework_name: str = "UseCase API"
 
 
 class Payload(PydanticModel):
@@ -75,26 +75,26 @@ class SourcePayload(PydanticModel):
 # ── Public API ───────────────────────────────────────────────────
 
 
-def create_rpc_voyager(
-    services: list[type[RpcService]],
+def create_use_case_voyager(
+    services: list[type[UseCaseService]],
     er_manager: ErManager | None = None,
-    name: str = "RPC API",
+    name: str = "UseCase API",
     module_color: dict[str, str] | None = None,
     initial_page_policy: Literal["first", "full", "empty"] = "first",
     online_repo_url: str | None = None,
     version: str = "1.0.0",
     gzip_minimum_size: int | None = 500,
 ) -> Any:
-    """Create a voyager visualization ASGI app for RPC services.
+    """Create a voyager visualization ASGI app for UseCase services.
 
     Returns a FastAPI application that can be mounted on any
     FastAPI/Starlette app.
 
     Usage::
 
-        from sqlmodel_nexus.voyager import create_rpc_voyager
+        from sqlmodel_nexus.voyager import create_use_case_voyager
 
-        voyager_app = create_rpc_voyager(
+        voyager_app = create_use_case_voyager(
             services=[UserService, TaskService],
             er_manager=er,
             name="My Project API",
@@ -102,7 +102,7 @@ def create_rpc_voyager(
         app.mount("/voyager", voyager_app)
 
     Args:
-        services: List of RpcService subclasses.
+        services: List of UseCaseService subclasses.
         er_manager: Optional ErManager for ER diagram visualization.
         name: Display name for the voyager UI.
         module_color: Optional color mapping for modules.

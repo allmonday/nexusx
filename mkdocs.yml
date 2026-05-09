@@ -1,0 +1,135 @@
+site_name: SQLModel Nexus
+site_description: "Progressive SQLModel extension — from ER diagrams to GraphQL API and beyond."
+site_url: https://allmonday.github.io/sqlmodel-nexus
+site_author: tangkikodo
+theme:
+  name: material
+  custom_dir: overrides
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - navigation.tracking
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - header.autohide
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.links.target_blank
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+repo_name: allmonday/sqlmodel-nexus
+repo_url: https://github.com/allmonday/sqlmodel-nexus
+edit_uri: ""
+
+exclude_docs: |
+  superpowers/
+
+nav:
+  - Guide:
+    - Overview: ./index.md
+    - Quick Start: ./guide/quick_start.md
+    - ER Diagram & Non-ORM Relationships: ./guide/er_diagram.md
+    - GraphQL Mode: ./guide/graphql_mode.md
+    - GraphQL Pagination: ./guide/graphql_pagination.md
+    - Auto-Generated Queries: ./guide/graphql_auto_query.md
+    - Core API Mode: ./guide/core_api.md
+    - Core API Advanced: ./guide/core_api_advanced.md
+    - Custom Relationships: ./guide/custom_relationship.md
+    - ER Diagram Visualization: ./guide/er_diagram_visual.md
+  - Advanced:
+    - MCP Service: ./advanced/mcp_service.md
+    - RPC Service: ./advanced/rpc_service.md
+    - RPC + FastAPI: ./advanced/rpc_fastapi.md
+    - Voyager Visualization: ./advanced/voyager.md
+  - API Reference:
+    - GraphQLHandler: ./api/api_graphql_handler.md
+    - Core API: ./api/api_core.md
+    - Cross-Layer Data Flow: ./api/api_cross_layer.md
+    - Relationships & ER Diagram: ./api/api_relationship.md
+    - MCP API: ./api/api_mcp.md
+    - RPC API: ./api/api_rpc.md
+  - Reference:
+    - Changelog: ./reference/changelog.md
+    - Migration Guide: ./reference/migration.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.superfences
+
+plugins:
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+          link: "/sqlmodel-nexus/"
+        - locale: zh
+          name: 中文
+          build: true
+          link: "/sqlmodel-nexus/zh/"
+          nav_translations:
+            Guide: "指南"
+            Advanced: "进阶"
+            API Reference: "API 参考"
+            Reference: "参考"
+            Overview: "总览"
+            Quick Start: "快速开始"
+            "ER Diagram & Non-ORM Relationships": "ER 图与非 ORM 关系"
+            "GraphQL Mode": "GraphQL 模式"
+            "GraphQL Pagination": "GraphQL 分页"
+            "Auto-Generated Queries": "自动查询"
+            "Core API Mode": "Core API 模式"
+            "Core API Advanced": "Core API 进阶"
+            "Custom Relationships": "自定义关系"
+            "ER Diagram Visualization": "ER 图可视化"
+            "MCP Service": "MCP 服务"
+            "RPC Service": "RPC 服务"
+            "RPC + FastAPI": "RPC + FastAPI"
+            "Voyager Visualization": "Voyager 可视化"
+            GraphQLHandler: "GraphQLHandler"
+            "Core API": "Core API"
+            "Cross-Layer Data Flow": "跨层数据流"
+            "Relationships & ER Diagram": "关系与 ER 图"
+            "MCP API": "MCP API"
+            "RPC API": "RPC API"
+            Changelog: "变更记录"
+            "Migration Guide": "迁移指南"
+
+extra_css:
+  - stylesheets/extra.css

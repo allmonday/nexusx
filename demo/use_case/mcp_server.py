@@ -1,24 +1,29 @@
-"""RPC MCP Server Demo — expose Core API services via MCP.
+"""UseCase MCP Server Demo — expose Core API services via MCP.
 
-Demonstrates how RpcService classes can be exposed to AI agents
-via three-layer progressive disclosure MCP tools.
+Demonstrates how UseCaseService classes can be exposed to AI agents
+via four-layer progressive disclosure MCP tools.
 
 Uses the Core API demo's models/database, providing Sprint and Task
 business services with DefineSubset DTOs and Resolver.
 
 Usage:
     # stdio mode (for Claude Desktop, etc.)
-    uv run --with fastmcp python -m demo.rpc_mcp_server
+    uv run --with fastmcp python -m demo.use_case.mcp_server
 
     # HTTP mode (for browser / MCP inspector)
-    uv run --with fastmcp python -m demo.rpc_mcp_server --http
+    uv run --with fastmcp python -m demo.use_case.mcp_server --http
 """
 
 from demo.core_api.database import async_session, init_db
 from demo.core_api.dtos import SprintDetail, SprintSummary, TaskSummary
 from demo.core_api.models import Sprint, Task, User
-from sqlmodel_nexus import ErManager, build_dto_select
-from sqlmodel_nexus.rpc import RpcService, create_rpc_mcp_server
+from sqlmodel_nexus import (
+    ErManager,
+    UseCaseAppConfig,
+    UseCaseService,
+    build_dto_select,
+    create_use_case_mcp_server,
+)
 
 # ──────────────────────────────────────────────────
 # ErManager & Resolver
@@ -36,7 +41,7 @@ Resolver = er.create_resolver()
 # ──────────────────────────────────────────────────
 
 
-class UserService(RpcService):
+class UserService(UseCaseService):
     """User management — query users."""
 
     @classmethod
@@ -49,7 +54,7 @@ class UserService(RpcService):
         return [{"id": u.id, "name": u.name} for u in users]
 
 
-class TaskService(RpcService):
+class TaskService(UseCaseService):
     """Task management — query tasks with auto-loaded owner."""
 
     @classmethod
@@ -82,7 +87,7 @@ class TaskService(RpcService):
         return await Resolver().resolve(dto)
 
 
-class SprintService(RpcService):
+class SprintService(UseCaseService):
     """Sprint management — query sprints with task statistics."""
 
     @classmethod
@@ -140,9 +145,15 @@ def main() -> None:
 
     asyncio.run(init_db())
 
-    mcp = create_rpc_mcp_server(
-        services=[UserService, TaskService, SprintService],
-        name="Core API RPC Demo",
+    mcp = create_use_case_mcp_server(
+        apps=[
+            UseCaseAppConfig(
+                name="project",
+                services=[UserService, TaskService, SprintService],
+                description="Project management with sprints, tasks, and users",
+            ),
+        ],
+        name="Core API UseCase Demo",
     )
 
     if "--http" in sys.argv:

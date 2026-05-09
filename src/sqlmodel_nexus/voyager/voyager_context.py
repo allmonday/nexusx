@@ -1,4 +1,4 @@
-"""VoyagerContext — shared business logic for RPC voyager API endpoints.
+"""VoyagerContext — shared business logic for UseCase voyager API endpoints.
 
 Simplified from fastapi-voyager's VoyagerContext, removing framework
 detection and pydantic-resolve dependencies.
@@ -8,13 +8,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from sqlmodel_nexus.loader.registry import ErManager
-from sqlmodel_nexus.rpc.business import RpcService
 from sqlmodel_nexus.voyager.er_diagram_dot import ErDiagramDotBuilder
 from sqlmodel_nexus.voyager.render import Renderer
 from sqlmodel_nexus.voyager.render_style import DEFAULT_PRIMARY
-from sqlmodel_nexus.voyager.rpc_voyager import RpcVoyager
 from sqlmodel_nexus.voyager.type import CoreData, SchemaNode, Tag
 from sqlmodel_nexus.voyager.type_helper import get_source, get_vscode_link
+from sqlmodel_nexus.voyager.use_case_voyager import UseCaseVoyager  # noqa: F401
 
 WEB_DIR = Path(__file__).parent / "web"
 
@@ -31,9 +30,9 @@ class VoyagerContext:
 
     def __init__(
         self,
-        services: list[type[RpcService]],
+        services: list[type[UseCaseService]],
         er_manager: ErManager | None = None,
-        name: str = "RPC API",
+        name: str = "UseCase API",
         module_color: dict[str, str] | None = None,
         initial_page_policy: str = 'first',
         online_repo_url: str | None = None,
@@ -48,17 +47,17 @@ class VoyagerContext:
         self.version = version
         self.theme_color = DEFAULT_PRIMARY
 
-    def _get_voyager(self, **kwargs) -> RpcVoyager:
-        """Create an RpcVoyager instance with common configuration."""
+    def _get_voyager(self, **kwargs) -> UseCaseVoyager:
+        """Create a UseCaseVoyager instance with common configuration."""
         config = {
             "module_color": self.module_color,
             "theme_color": self.theme_color,
         }
         config.update(kwargs)
-        return RpcVoyager(self.services, **config)
+        return UseCaseVoyager(self.services, **config)
 
     def analyze_and_get_dot(self) -> tuple[str, list[Tag], list[SchemaNode]]:
-        """Analyze RPC services and return dot graph, tags, and schemas."""
+        """Analyze UseCase services and return dot graph, tags, and schemas."""
         voyager = self._get_voyager()
         voyager.analysis()
         dot = voyager.render_dot()

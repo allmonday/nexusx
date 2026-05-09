@@ -40,7 +40,14 @@ src/sqlmodel_nexus/            # 主包
 ├── loader/                    # DataLoader 关系加载 (ErManager + factories + pagination)
 ├── discovery/                 # 实体发现
 ├── scanning/                  # 方法扫描 (@query/@mutation 发现)
-├── mcp/                       # MCP 服务
+├── use_case/                  # UseCase MCP 服务
+│   ├── business.py            #   UseCaseService + BusinessMeta
+│   ├── introspector.py        #   ServiceIntrospector
+│   ├── server.py              #   create_use_case_mcp_server (4层工具)
+│   ├── manager.py             #   UseCaseManager + UseCaseResources
+│   ├── types.py               #   UseCaseAppConfig
+│   └── context.py             #   FromContext
+├── mcp/                       # MCP 服务 (GraphQL)
 │   ├── builders/              #   Schema 格式化 + 类型追踪
 │   ├── managers/              #   单应用 / 多应用管理器
 │   ├── tools/                 #   MCP 工具实现
@@ -50,8 +57,12 @@ src/sqlmodel_nexus/            # 主包
 demo/                          # 演示应用
 ├── app.py                     # GraphQL demo (User/Post/Comment)
 ├── core_api/                  # Core API demo
-├── mcp_server.py              # MCP 多应用 demo
-└── mcp_server_simple.py       # MCP 单应用 demo
+├── use_case/                  # UseCase MCP demo
+│   ├── mcp_server.py          #   UseCase MCP 服务 demo
+│   ├── fastapi.py             #   FastAPI 集成 demo
+│   └── voyager_demo.py        #   Voyager 可视化 demo
+├── mcp_server.py              # MCP 多应用 demo (GraphQL)
+└── mcp_server_simple.py       # MCP 单应用 demo (GraphQL)
 tests/                         # 测试用例
 ```
 
@@ -85,9 +96,16 @@ from sqlmodel_nexus import (
     # 自定义关系 & ER 图
     Relationship,             # 自定义非 ORM 关系定义
     ErDiagram,                # Mermaid ER 图生成
+
+    # UseCase MCP 模式
+    UseCaseService,           # 业务服务基类（定义 use case 方法）
+    UseCaseAppConfig,         # 应用配置（name, services, description, context_extractor）
+    FromContext,              # 标记从 MCP context 注入的参数
+    create_use_case_mcp_server, # 创建 4 层渐进式披露 MCP 服务器
+    create_use_case_voyager,  # 创建 UseCase Voyager 可视化
 )
 
-# MCP
+# MCP (GraphQL)
 from sqlmodel_nexus.mcp import (
     config_simple_mcp_server, # 单应用 MCP 服务
     create_mcp_server,        # 多应用 MCP 服务
@@ -98,13 +116,15 @@ from sqlmodel_nexus.mcp import (
 ## 开发命令
 
 ```bash
-uv run pytest                                    # 运行测试
-uv run ruff check src/ tests/                    # Lint 检查
-uv run ruff check --fix src/ tests/              # Lint 修复
-uv run mypy src/                                 # 类型检查
-uv run python -m demo.app                        # 启动 GraphQL demo
-uv run uvicorn demo.core_api.app:app --port 8001 # 启动 Core API demo
-uv run --with fastmcp python -m demo.mcp_server  # 启动 MCP demo (stdio)
+uv run pytest                                              # 运行测试
+uv run ruff check src/ tests/                              # Lint 检查
+uv run ruff check --fix src/ tests/                        # Lint 修复
+uv run mypy src/                                           # 类型检查
+uv run python -m demo.app                                  # 启动 GraphQL demo
+uv run uvicorn demo.core_api.app:app --port 8001           # 启动 Core API demo
+uv run --with fastmcp python -m demo.mcp_server            # 启动 MCP demo (stdio, GraphQL)
+uv run --with fastmcp python -m demo.use_case.mcp_server   # 启动 UseCase MCP demo (stdio)
+uv run uvicorn demo.use_case.fastapi:app --port 8007       # 启动 UseCase FastAPI demo
 ```
 
 ## 核心约定

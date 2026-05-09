@@ -1,10 +1,10 @@
-"""RPC Voyager Demo — interactive visualization of RPC services and ER diagrams.
+"""UseCase Voyager Demo — interactive visualization of UseCase services and ER diagrams.
 
 Demonstrates how to mount the voyager visualization UI on a FastAPI app,
-showing both RPC service structure and entity-relationship diagrams.
+showing both UseCase service structure and entity-relationship diagrams.
 
 Run:
-    uv run uvicorn demo.rpc_voyager_demo:app --port 8008
+    uv run uvicorn demo.use_case.voyager_demo:app --port 8008
 
 Endpoints:
     http://localhost:8008/voyager     — Voyager visualization UI
@@ -27,9 +27,9 @@ from demo.core_api.models import (
     TaskLabel,
     User,
 )
-from demo.rpc.mcp_server import SprintService, TaskService, UserService
+from demo.use_case.mcp_server import SprintService, TaskService, UserService
 from sqlmodel_nexus import ErManager
-from sqlmodel_nexus.voyager import create_rpc_voyager
+from sqlmodel_nexus.voyager import create_use_case_voyager
 
 # ──────────────────────────────────────────────────
 # ErManager
@@ -44,10 +44,10 @@ er = ErManager(
 # Voyager app
 # ──────────────────────────────────────────────────
 
-voyager_app = create_rpc_voyager(
+voyager_app = create_use_case_voyager(
     services=[UserService, TaskService, SprintService],
     er_manager=er,
-    name="Core API RPC Demo",
+    name="Core API UseCase Demo",
 )
 
 # ──────────────────────────────────────────────────
@@ -62,8 +62,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="RPC Voyager Demo",
-    description="Demonstrates voyager visualization for RPC services",
+    title="UseCase Voyager Demo",
+    description="Demonstrates voyager visualization for UseCase services",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -88,7 +88,7 @@ app.mount("/voyager", voyager_app)
 @app.get("/")
 async def root():
     return {
-        "message": "RPC Voyager Demo",
+        "message": "UseCase Voyager Demo",
         "voyager": "/voyager — Interactive visualization UI",
         "endpoints": {
             "users": "/api/users",

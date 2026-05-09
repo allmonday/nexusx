@@ -64,11 +64,16 @@ from sqlmodel_nexus.loader import ErManager
 from sqlmodel_nexus.query_parser import FieldSelection, QueryParser
 from sqlmodel_nexus.relationship import Relationship
 from sqlmodel_nexus.resolver import Loader
-from sqlmodel_nexus.rpc import RpcService, create_rpc_mcp_server
 from sqlmodel_nexus.sdl_generator import SDLGenerator
 from sqlmodel_nexus.standard_queries import AutoQueryConfig, add_standard_queries
 from sqlmodel_nexus.subset import DefineSubset, SubsetConfig, build_dto_select
-from sqlmodel_nexus.voyager import create_rpc_voyager
+from sqlmodel_nexus.use_case import (
+    FromContext,
+    UseCaseAppConfig,
+    UseCaseService,
+    create_use_case_mcp_server,
+)
+from sqlmodel_nexus.voyager import create_use_case_voyager
 
 __all__ = [
     # Version
@@ -98,9 +103,11 @@ __all__ = [
     "ErDiagram",
     # Query builder
     "build_dto_select",
-    # RPC MCP mode
-    "RpcService",
-    "create_rpc_mcp_server",
+    # UseCase MCP mode
+    "UseCaseService",
+    "UseCaseAppConfig",
+    "FromContext",
+    "create_use_case_mcp_server",
     # Voyager visualization
-    "create_rpc_voyager",
+    "create_use_case_voyager",
 ]

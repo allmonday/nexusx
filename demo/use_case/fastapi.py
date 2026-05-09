@@ -1,13 +1,13 @@
-"""RPC FastAPI Demo — FastAPI routes calling RpcService methods.
+"""UseCase FastAPI Demo — FastAPI routes calling UseCaseService methods.
 
-Demonstrates how the same RpcService classes used by MCP can be called
+Demonstrates how the same UseCaseService classes used by MCP can be called
 directly from FastAPI routes, showing that business logic lives in one
 place and serves both HTTP API and MCP.
 
 Routes are grouped by OpenAPI tags derived from Service.get_tag_name().
 
 Run:
-    uv run uvicorn demo.rpc_fastapi:app --reload
+    uv run uvicorn demo.use_case.fastapi:app --reload
 
 Endpoints:
     GET /api/users                        — User list
@@ -25,7 +25,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from demo.core_api.database import init_db
-from demo.rpc.mcp_server import SprintService, TaskService, UserService
+from demo.use_case.mcp_server import SprintService, TaskService, UserService
 
 
 @asynccontextmanager
@@ -35,8 +35,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="RPC FastAPI Demo",
-    description="FastAPI routes calling RpcService classmethods",
+    title="UseCase FastAPI Demo",
+    description="FastAPI routes calling UseCaseService classmethods",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -53,7 +53,7 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {
-        "message": "RPC FastAPI Demo",
+        "message": "UseCase FastAPI Demo",
         "endpoints": {
             "users": "/api/users",
             "tasks": "/api/tasks",

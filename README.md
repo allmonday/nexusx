@@ -1,5 +1,10 @@
 # SQLModel Nexus
 
+
+[![pypi](https://img.shields.io/pypi/v/sqlmodel-nexus.svg)](https://pypi.python.org/pypi/sqlmodel-nexus)
+[![PyPI Downloads](https://static.pepy.tech/badge/sqlmodel-nexus/month)](https://pepy.tech/projects/sqlmodel-nexus)
+![Python Versions](https://img.shields.io/pypi/pyversion/sqlmodel-nexus)
+
 Build a codebase architecture that serves both humans and AI — from one model definition.
 
 Define SQLModel entities once, then progressively expose them through GraphQL (human validation), REST + OpenAPI (frontend delivery), and MCP (AI agent integration). Entity relationships, DataLoader batching, and response DTOs are all derived from the same model declarations — no duplication, no drift.
@@ -12,10 +17,6 @@ flowchart LR
     model --> mcp["MCP Server<br/>Progressive-disclosure<br/>AI agent tools"]
     model --> viz["Voyager<br/>Interactive ER diagram<br/>Service visualization"]
 ```
-
-[![pypi](https://img.shields.io/pypi/v/sqlmodel-nexus.svg)](https://pypi.python.org/pypi/sqlmodel-nexus)
-[![PyPI Downloads](https://static.pepy.tech/badge/sqlmodel-nexus/month)](https://pepy.tech/projects/sqlmodel-nexus)
-![Python Versions](https://img.shields.io/pypi/pyversion/sqlmodel-nexus)
 
 ## Why sqlmodel-nexus
 

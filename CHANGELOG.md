@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.8.0
+
+### Voyager ER Diagram: 关系字段重构
+
+ER diagram 的关系展示方式从「FK 字段出发」改为「relationship name 字段出发」。边从 `owner: User` 这样的 relationship 字段出发连到目标实体，而非从 `user_id` 这样的 FK 字段出发。
+
+**Changes:**
+- `voyager/er_diagram_dot.py`: `_get_entity_fields()` 新增 relationship 字段（`name: TargetType`）；`_add_relationship_link()` source anchor 从 `fk_field` 改为 `rel_info.name`；`fk_set` 替换为 `rel_name_set`
+- `voyager/templates/dot/link.j2`: 去掉硬编码的 `:e` / `:w` 端口方向，由 Graphviz 自动选择最优端口
+- `README.md`: 重写开头，强调"一套模型，四种消费路径"定位；Mermaid 流程图改为星型结构
+- `voyager/web/manifest.webmanifest`: 新增 PWA manifest 文件
+- `voyager/web/index.html`: manifest 路径改为 static mount 路径；Google Fonts 替换为 `fonts.loli.net` 镜像
+
+## 1.7.0
+
+### Voyager ER Diagram: 关系字段重构（内部版本）
+
+与 1.8.0 内容相同，作为快速迭代版本发布。
+
 ## 1.6.0
 
 ### New Feature: Voyager 支持 resolve/post/expose/send 元信息显示

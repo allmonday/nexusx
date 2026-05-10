@@ -12,7 +12,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel
 
-from src.database import async_session, init_db
+from src.db import async_session
+from src.database import init_db
 from src.models import BaseEntity
 from sqlmodel_nexus import GraphQLHandler
 

@@ -12,7 +12,7 @@ from sqlmodel import Field, Relationship, SQLModel, select
 
 from sqlmodel_nexus import mutation, query
 
-from src.database import async_session
+from src.db import async_session
 
 
 class BaseEntity(SQLModel):

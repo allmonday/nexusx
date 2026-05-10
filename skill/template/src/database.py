@@ -1,15 +1,11 @@
-"""Database engine + session factory + mock seed data.
+"""Database seed data.
 
-Phase 1: engine + create_all + mock seed (供团队讨论数据样本).
+Phase 1: create_all + mock seed (供团队讨论数据样本).
 """
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
+from src.db import async_session, engine
 from src.models import Sprint, Task, User
-
-engine = create_async_engine("sqlite+aiosqlite://", echo=False)
-async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 async def init_db() -> None:

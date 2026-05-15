@@ -697,12 +697,12 @@ class TestDefaultValueFormat:
         assert enabled_arg["defaultValue"] != "False"
 
     def test_list_default_format(self, generator: IntrospectionGenerator):
-        """List defaults must be valid GraphQL list literals."""
+        """Optional list with None default renders as null in GraphQL."""
         schema = generator.generate()
         field = self._get_mutation_field(schema, "introspectionConfigCreateConfig")
         tags_arg = next(a for a in field["args"] if a["name"] == "tags")
 
-        assert tags_arg["defaultValue"] == "[]"
+        assert tags_arg["defaultValue"] == "null"
 
     def test_build_client_schema_succeeds(self, generator: IntrospectionGenerator):
         """Full introspection result must be consumable by graphql build_client_schema.

@@ -5,6 +5,15 @@ from __future__ import annotations
 import inspect
 from typing import Any, get_type_hints
 
+from graphql import (
+    BooleanValueNode,
+    EnumValueNode,
+    FloatValueNode,
+    IntValueNode,
+    NullValueNode,
+    StringValueNode,
+)
+
 
 class ArgumentBuilder:
     """Builds method arguments from GraphQL field arguments."""
@@ -36,12 +45,18 @@ class ArgumentBuilder:
         if node.__class__.__name__ == "NullValueNode":
             return None
 
-        # Handle enum value (EnumValueNode)
-        if hasattr(node, "value") and node.__class__.__name__ == "EnumValueNode":
+        # Handle scalar values with proper type conversion
+        if isinstance(node, IntValueNode):
+            return int(node.value)
+        elif isinstance(node, FloatValueNode):
+            return float(node.value)
+        elif isinstance(node, StringValueNode):
             return node.value
-
-        # Handle simple scalar values (String, Int, Float, Boolean)
-        if hasattr(node, "value"):
+        elif isinstance(node, BooleanValueNode):
+            return node.value
+        elif isinstance(node, NullValueNode):
+            return None
+        elif isinstance(node, EnumValueNode):
             return node.value
 
         # Fallback - return the node itself

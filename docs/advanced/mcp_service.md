@@ -2,6 +2,10 @@
 
 Expose SQLModel APIs to AI agents — create an MCP service with a single line of code.
 
+> **Prerequisites**: SQLModel entities with `@query`/`@mutation` methods and a `session_factory`. This path covers the **GraphQL→MCP** bridge — for the **UseCase→MCP** path see [UseCase Service](./use_case_service.md).
+>
+> **Live demo**: [`demo/mcp_server_simple.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/mcp_server_simple.py) (single-app) and [`demo/mcp_server.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/mcp_server.py) (multi-app).
+
 ## Installation
 
 ```bash

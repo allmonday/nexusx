@@ -2,7 +2,11 @@
 
 The Core API mode is for scenarios beyond GraphQL — FastAPI REST endpoints, service layer response assembly, or any use-case DTO. Same DataLoader batch loading, same N+1 prevention.
 
-Core concepts progress in order: **Implicit auto-loading → resolve_\* → post_\* → Cross-layer data flow**.
+> **Prerequisites**: SQLModel entities defined with `Relationship` / `Field(foreign_key=...)`.
+>
+> **Live demo**: See [`demo/core_api/`](https://github.com/allmonday/sqlmodel-nexus/tree/master/demo/core_api) for a complete REST server with Sprint/Task/User models. The DTOs in [`dtos.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/core_api/dtos.py) progress through 5 levels of complexity.
+
+Core concepts progress in order: **Implicit auto-loading → resolve\_\* → post\_\* → Cross-layer data flow**.
 
 ## Step 1: DefineSubset + Implicit Auto-Loading
 
@@ -23,6 +27,8 @@ class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))
     tasks: list[TaskDTO] = []      # Name matches Sprint.tasks relationship → auto-loaded
 ```
+
+> ⬆ This is **Level 2** in the demo's [`dtos.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/core_api/dtos.py#L30).
 
 ## ErManager Initialization
 
@@ -48,49 +54,23 @@ app = FastAPI()
 async def get_sprints():
     async with async_session() as session:
         sprints = (await session.exec(select(Sprint))).all()
-    dtos = [SprintDTO(id=s.id, name=s.name) for s in sprints]
-    return await Resolver().resolve(dtos)
+    dtos = [SprintDTO(**s.model_dump()) for s in sprints]
+    return await Resolver().resolve(dtos)  # tasks + owner auto-loaded
 ```
 
-## Four Conditions for Implicit Auto-Loading
+> **Tip**: For more efficient field-selective queries, use `build_dto_select(SprintDTO)` — it generates a SQLAlchemy select() that only fetches the fields declared in `__subset__`. See [`demo/core_api/dtos.py` → `TaskService.list_tasks`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/use_case/mcp_server.py#L63).
 
-The Resolver automatically loads relationship fields (no need to write `resolve_*`) when all conditions are met:
+## How Auto-Loading Works
+
+Implicit auto-loading triggers when **all** conditions are true:
 
 1. The field has no corresponding `resolve_*` method
-2. The field is an extra field (not in the `__subset__` definition)
-3. The field name matches a registered ORM/custom relationship
-4. The field type is a BaseModel DTO compatible with the relationship target entity
-
-## DefineSubset Rules
-
-- `__subset__` accepts a tuple `(Entity, ('field1', 'field2'))`
-- FK fields (e.g., `owner_id`) are automatically hidden from serialization output, but remain internally accessible in `resolve_*`
-- Relationship fields are declared in the class body (not in `__subset__`), and must use DTO types
-
-## How It Works
-
-```
-SprintDTO(id=1, name="Sprint 1")
-  → Implicit auto-load: tasks → [TaskDTO(...), TaskDTO(...)]
-    → Each TaskDTO: Implicit auto-load: owner → UserDTO(...)
-  → Result: complete nested response tree
-```
-
-Each relationship executes only one DataLoader query, regardless of how many Sprints or Tasks exist.
-
-## DTO Type Constraint
-
-```python
-# Wrong — direct use of SQLModel entity is prohibited
-class TaskDTO(DefineSubset):
-    owner: User | None = None  # TypeError!
-
-# Correct — use DTO type
-class TaskDTO(DefineSubset):
-    owner: UserDTO | None = None  # OK
-```
+2. The field is an extra field (not in `__subset__` fields)
+3. The field name matches a registered ORM or custom relationship
+4. The field type is a DefineSubset DTO compatible with the relationship target
 
 ## Next Steps
 
-- [Core API Advanced](./core_api_advanced.md) — resolve_*/post_*/cross-layer data flow
-- [Custom Relationships](./custom_relationship.md) — Non-ORM relationship declarations
+- [Core API Advanced](./core_api_advanced.md) — resolve_*, post_*, cross-layer data flow
+- [Custom Relationships](./custom_relationship.md) — non-ORM relationships
+- [UseCase Service](../advanced/use_case_service.md) — wrap Core API DTOs in business services

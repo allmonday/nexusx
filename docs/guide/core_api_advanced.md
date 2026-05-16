@@ -2,6 +2,10 @@
 
 When implicit auto-loading is not enough, Core API provides three progressive capabilities: `resolve_*` for custom loading, `post_*` for derived field computation, and cross-layer data flow.
 
+> **Prerequisites**: [Core API Mode](./core_api.md) — specifically DefineSubset, ErManager, and implicit auto-loading.
+>
+> **Live demo**: The advanced concepts below correspond to Levels 3–5 in [`demo/core_api/dtos.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/core_api/dtos.py).
+
 ## resolve_*: Custom Loading
 
 When the field name doesn't match a relationship, or custom logic is needed, use `resolve_*`:
@@ -58,6 +62,8 @@ class SprintDTO(DefineSubset):
         return sorted({t.owner.name for t in self.tasks if t.owner})
 ```
 
+> ⬆ This is **Level 3** in the demo: [`SprintSummary`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/core_api/dtos.py#L53).
+
 Execution order:
 
 1. Implicit auto-loading → `tasks` populated with TaskDTO list
@@ -78,60 +84,72 @@ Execution order:
 
 Use when parent and child nodes need cross-layer collaboration. Only necessary when the tree structure truly matters.
 
-### ExposeAs: Ancestor → Descendant
+**Key tools**:
+
+- `ExposeAs`: Parent exposes a value to all descendants via `ancestor_context`
+- `SendTo`: Child sends a value upward to ancestor Collector
+- `Collector`: Aggregates all values sent via SendTo
 
 ```python
-from typing import Annotated
-from sqlmodel_nexus import ExposeAs
+from sqlmodel_nexus import Collector, DefineSubset, SubsetConfig
+
+class TaskDTO(DefineSubset):
+    __subset__ = SubsetConfig(
+        kls=Task, fields=["id", "title"],
+        send_to=[("owner", "contributors")],   # Send owner to ancestor collector
+    )
+    owner: UserDTO | None = None
+
+    def post_full_title(self, ancestor_context=None):
+        sprint_name = (ancestor_context or {}).get("sprint_name", "unknown")
+        return f"{sprint_name} / {self.title}"
 
 class SprintDTO(DefineSubset):
-    __subset__ = (Sprint, ("id", "name"))
-    name: Annotated[str, ExposeAs('sprint_name')]  # Expose to descendants
-    tasks: list[TaskDTO] = []
-```
-
-### SendTo + Collector: Descendant → Ancestor
-
-```python
-from sqlmodel_nexus import SendTo, Collector
-
-class SprintDTO(DefineSubset):
-    __subset__ = (Sprint, ("id", "name"))
-    name: Annotated[str, ExposeAs('sprint_name')]
+    __subset__ = SubsetConfig(
+        kls=Sprint, fields=["id", "name"],
+        expose_as=[("name", "sprint_name")],   # Expose name to descendants
+    )
     tasks: list[TaskDTO] = []
     contributors: list[UserDTO] = []
 
-    def post_contributors(self, collector=Collector('contributors')):
-        return collector.values()  # Collect values sent by descendants
-
-class TaskDTO(DefineSubset):
-    __subset__ = (Task, ("id", "title", "owner_id"))
-    owner: Annotated[UserDTO | None, SendTo('contributors')] = None  # Send to ancestor
-    full_title: str = ""
-
-    def post_full_title(self, ancestor_context):
-        return f"{ancestor_context['sprint_name']} / {self.title}"
+    def post_contributors(self, collector=Collector("contributors")):
+        return collector.values()
 ```
 
-Applicable scenarios:
+> ⬆ This is **Level 4** in the demo: [`SprintDetail`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/core_api/dtos.py#L107).
 
-- Child nodes need ancestor context (sprint name, permission info, tenant configuration)
-- Parent nodes need to aggregate results from multiple descendants (contributors, tags)
+## Custom Non-ORM Relationships
 
-## Resolver Options
+For data sources that don't use ORM relationships (external APIs, caches, computed edges), declare custom `Relationship` on SQLModel entities with a hand-written async loader:
 
 ```python
-result = await Resolver(
-    context={"user_id": 42},     # Pass global context
-    loader_params={},            # DataLoader extra parameters
-).resolve(dtos)
+from sqlmodel_nexus import Relationship as CustomRelationship
+
+async def tags_loader(task_ids: list[int]) -> list[list[Tag]]:
+    async with get_session() as session:
+        stmt = select(Tag, TaskTag.task_id).join(TaskTag).where(TaskTag.task_id.in_(task_ids))
+        rows = (await session.exec(stmt)).all()
+        return build_list(rows, task_ids, lambda r: r[1], lambda r: r[0])
+
+class Task(SQLModel, table=True):
+    __relationships__ = [
+        CustomRelationship(fk="id", target=list[Tag], name="tags", loader=tags_loader)
+    ]
 ```
 
-## Loader Dependency Name Rule
+DTO auto-loads custom relationships the same way as ORM ones:
 
-`Loader('author')` requires a relationship named `author` in ErManager. When using implicit auto-loading, you typically don't need to write Loaders manually.
+```python
+class TaskDTO(DefineSubset):
+    __subset__ = (Task, ("id", "title"))
+    tags: list[TagDTO] = []     # Auto-loaded from the custom relationship
+```
 
-## Next Steps
+> ⬆ This is **Level 5** in the demo: [`TaskWithTags`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/core_api/dtos.py#L140).
 
-- [Custom Relationships](./custom_relationship.md) — Non-ORM relationship declarations
-- [MCP Service](../advanced/mcp_service.md) — Expose APIs to AI agents
+## Execution Order (Full)
+
+1. Execute all `resolve_*` methods on current node (load relationship data)
+2. Traverse existing object/relationship fields recursively (depth-first)
+3. Execute all `post_*` methods on current node (compute derived fields)
+4. Collect SendTo values upward to ancestor Collectors

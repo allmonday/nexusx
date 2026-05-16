@@ -2,9 +2,14 @@
 
 ## 项目定位
 
-sqlmodel-nexus：从 SQLModel 类自动生成 GraphQL API，并提供 Core API 模式构建用例响应的 Python 库。
-- **GraphQL 模式**：SDL 自动生成 + DataLoader 批量关系加载 + MCP 服务集成
-- **Core API 模式**：DefineSubset DTO + ErManager + Resolver 模型驱动的响应构建
+sqlmodel-nexus：从 SQLModel 实体模型出发，自动生成 GraphQL / REST / MCP 三种 API 的 Python 库。
+
+核心理念：定义一次数据模型，获得三种 API 输出，N+1 查询自动防护。
+
+三条使用路径：
+- **GraphQL 模式**：在实体上写 `@query`/`@mutation` → 自动生成 SDL → GraphQLHandler 执行查询
+- **Core API 模式**：`DefineSubset` DTO → `ErManager` + `Resolver` → 构建 REST 响应 / 业务 DTO
+- **UseCase 模式**：`UseCaseService` 业务类 → 同时输出 MCP（AI Agent）和 FastAPI（REST）
 
 ## 技术栈
 

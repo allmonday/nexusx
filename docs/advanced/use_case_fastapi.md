@@ -2,6 +2,10 @@
 
 Using the same UseCaseService class in FastAPI — routes are thin wrappers, business logic stays in the service.
 
+> **Prerequisites**: [UseCase Service](./use_case_service.md). You should have a UseCaseService subclass with `@query`/`@mutation` methods before wiring it into FastAPI.
+>
+> **Prerequisite demo**: [`demo/use_case/mcp_server.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/use_case/mcp_server.py) — defines the services. [`demo/use_case/fastapi.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/use_case/fastapi.py) — the same services as REST.
+
 ## Route Definitions
 
 ```python

@@ -2,6 +2,8 @@
 
 sqlmodel-nexus includes a built-in Voyager module that provides interactive UseCase service graphs and ER entity relationship visualization.
 
+> **Prerequisites**: [UseCase Service](./use_case_service.md) (for service graph) and optionally [Core API Mode](../guide/core_api.md) (for ER diagram integration via `er_manager`).
+
 ## create_use_case_voyager
 
 ```python

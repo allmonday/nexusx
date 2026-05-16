@@ -1,12 +1,21 @@
-"""SQLModel Nexus - GraphQL SDL generation and Core API response building.
+"""sqlmodel-nexus — from SQLModel entities to GraphQL / REST / MCP APIs.
 
-This package provides:
-- Automatic GraphQL SDL generation from SQLModel classes
-- @query/@mutation decorators for defining GraphQL operations
-- DataLoader-based relationship resolution
-- Per-relationship pagination support
-- DefineSubset for creating independent DTO models from SQLModel entities
-- ErManager for entity-relationship management and Resolver creation
+Define your data model once as SQLModel entities; get three API outputs
+automatically with built-in N+1 prevention via DataLoader batch loading.
+
+┌─ GraphQL mode ─────────── @query/@mutation → SDL auto-generation → GraphQLHandler
+├─ Core API (REST) ──────── DefineSubset DTO → ErManager → Resolver → FastAPI
+└─ UseCase (MCP) ────────── UseCaseService → create_use_case_mcp_server → AI agents
+
+Core capabilities:
+- @query/@mutation decorators: mark entity methods as GraphQL operations
+- SDLGenerator + GraphQLHandler: auto-generate SDL and execute queries
+- DataLoader batch loading: per-relationship, N+1-proof, optional pagination
+- DefineSubset: create pure Pydantic DTOs from SQLModel entities
+- ErManager + Resolver: model-driven tree traversal with implicit auto-loading
+- UseCaseService: one business logic class, two outputs (MCP + FastAPI)
+- Relationship: declare non-ORM relationships with custom DataLoaders
+- ErDiagram + Voyager: visualize entity graphs and service topologies
 
 Example (GraphQL mode):
     ```python

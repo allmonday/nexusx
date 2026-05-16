@@ -2,6 +2,10 @@
 
 From SQLModel entities to a complete GraphQL API — SDL auto-generation, automatic relationship resolution, and DataLoader batch loading.
 
+> **Prerequisites**: You should be familiar with [SQLModel](https://sqlmodel.tiangolo.com/) entity definitions (SQLModel + Field + Relationship).
+>
+> **Live demo**: See [`demo/app.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/app.py) for a working GraphQL server (User/Post/Comment).
+
 ## GraphQLHandler Configuration
 
 ```python

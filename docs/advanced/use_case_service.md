@@ -2,6 +2,10 @@
 
 UseCaseService lets you define business logic as service classes that serve both MCP and web frameworks — one definition, two presentations.
 
+> **Prerequisites**: [Core API Mode](../guide/core_api.md) — ErManager + DefineSubset + Resolver. UseCaseService wraps Core API DTOs into business methods.
+>
+> **Live demo**: See [`demo/use_case/mcp_server.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/use_case/mcp_server.py) for a working MCP server — and [`demo/use_case/fastapi.py`](https://github.com/allmonday/sqlmodel-nexus/blob/master/demo/use_case/fastapi.py) for the same services exposed as REST.
+
 ## Design Philosophy
 
 ```

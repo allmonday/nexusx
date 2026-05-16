@@ -1,16 +1,15 @@
 """Phase 1→2: SQLModel entity definitions.
 
-Phase 1: Entity skeleton + Relationship + @query/@mutation (pass + docstring).
-Phase 2: Complete method implementations with SQLAlchemy async.
+Phase 1: Pure entity fields + Relationship declarations (no methods).
+Phase 2: Method mounting from service/<domain>/methods.py via _mount().
 
 Entity graph:
     Sprint ──1:N──→ Task ──N:1──→ User
 """
 from typing import Optional
 
-from sqlmodel import Field, Relationship, SQLModel, select
+from sqlmodel import Field, Relationship, SQLModel
 
-from sqlmodel_nexus import mutation, query
 from src.db import async_session
 
 
@@ -27,23 +26,6 @@ class User(BaseEntity, table=True):
     # ORM relationships
     tasks: list["Task"] = Relationship(back_populates="owner")
 
-    @query
-    async def get_users(cls) -> list["User"]:
-        """获取所有用户。"""
-        async with async_session() as session:
-            result = await session.exec(select(cls))
-            return list(result.all())
-
-    @mutation
-    async def create_user(cls, name: str) -> "User":
-        """创建新用户。"""
-        async with async_session() as session:
-            user = cls(name=name)
-            session.add(user)
-            await session.commit()
-            await session.refresh(user)
-            return user
-
 
 class Sprint(BaseEntity, table=True):
     """迭代周期，包含一批待完成的任务。"""
@@ -56,23 +38,6 @@ class Sprint(BaseEntity, table=True):
         back_populates="sprint",
         sa_relationship_kwargs={"order_by": "Task.id"},
     )
-
-    @query
-    async def get_sprints(cls) -> list["Sprint"]:
-        """获取所有 Sprint。"""
-        async with async_session() as session:
-            result = await session.exec(select(cls))
-            return list(result.all())
-
-    @mutation
-    async def create_sprint(cls, name: str) -> "Sprint":
-        """创建新 Sprint。"""
-        async with async_session() as session:
-            sprint = cls(name=name)
-            session.add(sprint)
-            await session.commit()
-            await session.refresh(sprint)
-            return sprint
 
 
 class Task(BaseEntity, table=True):
@@ -89,22 +54,36 @@ class Task(BaseEntity, table=True):
     sprint: Optional["Sprint"] = Relationship(back_populates="tasks")
     owner: Optional["User"] = Relationship()
 
-    @query
-    async def get_tasks(cls) -> list["Task"]:
-        """获取所有任务。"""
-        async with async_session() as session:
-            result = await session.exec(select(cls))
-            return list(result.all())
 
-    @mutation
-    async def create_task(cls, title: str, sprint_id: int, owner_id: int | None = None) -> "Task":
-        """在指定 Sprint 中创建新任务。"""
-        async with async_session() as session:
-            task = cls(title=title, sprint_id=sprint_id, owner_id=owner_id)
-            session.add(task)
-            await session.commit()
-            await session.refresh(task)
-            return task
+# ── Method mounting (Phase 2) ─────────────────────────────────────────
+
+import functools  # noqa: E402
+
+from sqlmodel_nexus import mutation, query  # noqa: E402
+from src.service.sprint.methods import create_sprint, list_sprints  # noqa: E402
+from src.service.task.methods import create_task, get_tasks_by_sprint, list_tasks  # noqa: E402
+from src.service.user.methods import create_user, list_users  # noqa: E402
+
+
+def _mount(entity, name, fn, decorator):
+    """Mount a plain async function to entity as @query/@mutation classmethod.
+
+    Wraps ``fn`` to accept an unused ``cls`` parameter (required by classmethod
+    protocol) and copies the docstring so GraphQL SDL picks up the description.
+    """
+    @functools.wraps(fn)
+    async def wrapper(cls, *args, **kwargs):
+        return await fn(*args, **kwargs)
+    setattr(entity, name, decorator(wrapper))
+
+
+_mount(User, "list_users", list_users, query)
+_mount(User, "create_user", create_user, mutation)
+_mount(Sprint, "list_sprints", list_sprints, query)
+_mount(Sprint, "create_sprint", create_sprint, mutation)
+_mount(Task, "list_tasks", list_tasks, query)
+_mount(Task, "get_tasks_by_sprint", get_tasks_by_sprint, query)
+_mount(Task, "create_task", create_task, mutation)
 
 
 # ── ErManager + Resolver (Phase 3) ──────────────────────────────────────

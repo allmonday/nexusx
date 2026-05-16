@@ -212,7 +212,7 @@ service/<domain>/methods.py  ← 独立定义业务逻辑（核心）
 
 ```
 src/
-├── models.py       # Phase 1 骨架 → Phase 2 从 methods 挂载 @query/@mutation
+├── models.py       # Phase 1 纯实体 → Phase 2 从 methods 挂载 @query/@mutation
 ├── db.py           # Phase 1（engine + session factory，不依赖 models）
 ├── database.py     # Phase 1（mock seed，依赖 db + models）
 ├── service/        # Phase 2 新增 methods.py，Phase 3 补充 service.py/dtos.py
@@ -234,22 +234,22 @@ src/
 
 ## 四阶段定义
 
-### Phase 1: Schema + ER Diagram + 聚合根入口
+### Phase 1: Schema + ER Diagram + mock seed
 
-**目标**: 定义实体、关系、查询/变更契约，用 ER diagram 可视化供团队讨论。
+**目标**: 定义纯实体模型（字段 + 关系声明）、mock seed data，用 ER diagram 可视化供团队讨论。**不含任何业务方法**。
 
 **新增/修改文件**:
 - `db.py` — aiosqlite engine + session_factory（不导入 models，避免循环依赖）
-- `models.py` — SQLModel 实体 + Relationship + `@query`/`@mutation`（从 `db.py` 导入 `async_session`）
+- `models.py` — 纯 SQLModel 实体 + Relationship（仅字段和关系，不含方法，不导入 `sqlmodel_nexus`）
 - `database.py` — mock seed data（从 `db.py` 导入 engine/session，从 `models.py` 导入实体）
-- `main.py` — FastAPI + Voyager（ER diagram 可视化）+ GraphiQL
+- `main.py` — FastAPI + Voyager（ER diagram 可视化）
 
 **关键模式**:
-- SQLModel 实体 + Relationship 声明关系方向
+- SQLModel 实体 + Relationship 声明关系方向，**不包含任何 @query/@mutation 方法**
 - 每个 Model 必须有 docstring 说明业务含义，每个 Field 必须有 `description` 说明字段语义
-- `@query` / `@mutation` 方法体用 `pass` + docstring 描述业务意图
 - mock seed data 用于讨论数据样本是否合理（数量、关联关系、边界值）
 - Voyager 通过 `create_use_case_voyager(services=[], er_manager=er)` 展示 ER diagram
+- Phase 1 无 GraphiQL（无方法可查询），GraphQL 在 Phase 2 方法挂载后可用
 
 **V 降 — 定义验收标准:**
 进入 Phase 1 实现之前，在 `spec/phase1.md` 中记录以下验收标准：
@@ -257,20 +257,18 @@ src/
 | # | 验收项 | 验证方式 |
 |---|--------|----------|
 | 1 | 每个 Entity 在 Voyager ER 图中正确显示，关系线方向正确 | 浏览器打开 Voyager |
-| 2 | `/schema` 返回的 GraphQL SDL 覆盖所有实体 + 关系查询 | curl /schema |
-| 3 | mock seed 数据样本展示合理的数量、关联关系和边界值 | 打印 database.py 中 seed 数据 |
-| 4 | mock seed 中的数据能从 GraphiQL 中查询到 | GraphiQL 执行 `{ userGetAll { id name } }` |
+| 2 | `models.py` 中每个 Entity 只包含字段 + Relationship，无任何业务方法 | 检查代码结构 |
+| 3 | mock seed 数据样本展示合理的数量、关联关系和边界值 | 编写简单查询验证记录数 |
 
 **实现：**
-编写 `db.py` → `models.py` → `database.py` → `main.py`
+编写 `db.py` → `models.py`(纯实体，无方法) → `database.py` → `main.py`
 
 **V 升 — 逐条回查验收:**
 按验收标准逐条验证，用户确认后才写入 `spec/phase1.md`：
 
 - [ ] 1. Voyager ER 图：实体节点、关系线、聚合根高亮
-- [ ] 2. SDL：Schema 覆盖全部实体 + 查询入口
+- [ ] 2. Entity 纯字段：无 @query/@mutation 方法，无 `sqlmodel_nexus` 导入
 - [ ] 3. mock seed：数据量合理、关联关系正确、包含边界用例
-- [ ] 4. GraphiQL seed 可见：`{ userGetAll { id name } }` 返回预期数据
 
 ### Phase 2: 方法实现 + Entity 挂载
 
@@ -281,8 +279,24 @@ src/
 - `models.py` — 从 methods 导入并通过 `Entity.method = query(fn)` / `Entity.method = mutation(fn)` 挂载
 
 **关键模式**:
-- 业务方法在 `service/<domain>/methods.py` 中定义，为普通 async 函数（非 classmethod）
-- `models.py` 只负责挂载：`User.register = mutation(register)`
+- 业务方法在 `service/<domain>/methods.py` 中定义，为普通 async 函数（不含 `cls` 参数，非 classmethod）
+- `models.py` 通过 `_mount()` 辅助函数挂载（桥接 classmethod 协议）：
+  ```python
+  import functools
+  from sqlmodel_nexus import mutation, query
+  from src.service.user.methods import list_users, create_user
+
+  def _mount(entity, name, fn, decorator):
+      """Wrap a plain async function to accept cls, then apply decorator."""
+      @functools.wraps(fn)
+      async def wrapper(cls, *args, **kwargs):
+          return await fn(*args, **kwargs)
+      setattr(entity, name, decorator(wrapper))
+
+  _mount(User, "list_users", list_users, query)
+  _mount(User, "create_user", create_user, mutation)
+  ```
+- `_mount()` 保留原始函数的 docstring，确保 GraphQL SDL 正确生成描述
 - GraphQL 作为辅助测试接口，`@query`/`@mutation` 装饰器在挂载时应用
 - 挂载代码放在 Entity class 定义之后、ErManager 之前
 
@@ -330,6 +344,9 @@ src/
 - `UseCaseService` 统一业务逻辑入口（同时服务 MCP 和 FastAPI）
 - `@query` / `@mutation` 装饰器标记服务方法
 - `build_dto_select()` 只查 DTO 需要的列
+- **UseCaseService 复用 `service/<domain>/methods.py` 中的核心逻辑，不重新实现**：
+  - **mutation 方法**：直接调用 methods.py 函数获取 Entity，再转换为 DTO
+  - **query 方法**：使用 `build_dto_select` 高效查询 DTO 字段（查询模式遵循 methods.py 语义）
 - `create_use_case_voyager()` 可视化服务结构
 - `create_use_case_mcp_server()` + `UseCaseAppConfig` 暴露给 AI agent
 - REST 端点通过 `tags=[Service.get_tag_name()]` 分组
@@ -386,10 +403,10 @@ npx openapi-typescript http://localhost:8000/openapi.json -o sdk/schema.d.ts
 
 | 方面 | Phase 1 | Phase 2 | Phase 3 | Phase 4 |
 |------|---------|---------|---------|---------|
-| 实体 | SQLModel 骨架 + docstring + mock seed | 方法体实现 | 继承 Phase 2 | - |
+| 实体 | 纯字段 + Relationship + docstring + mock seed | methods.py 实现 + `_mount()` 挂载到 Entity | 继承 Phase 2 | - |
 | 关系 | Relationship 声明 | DataLoader 实现 | DefineSubset 隐藏 FK | - |
-| 查询 | pass 占位 | SQLAlchemy async | UseCaseService 封装 | - |
-| API | Voyager(ER diagram) + GraphiQL | GraphQL | GraphQL + REST + Voyager(+services) + MCP | TS SDK |
+| 查询 | 无方法 | methods.py + `_mount()` 挂载 | UseCaseService 封装（复用 methods.py） | - |
+| API | Voyager(ER diagram) | GraphiQL | GraphQL + REST + Voyager(+services) + MCP | TS SDK |
 | 响应 | N/A | 完整实体 | DefineSubset DTO | OpenAPI spec |
 
 ## 踩坑经验
@@ -406,6 +423,7 @@ npx openapi-typescript http://localhost:8000/openapi.json -o sdk/schema.d.ts
 10. **每个 Model 必须有 docstring，每个 Field 必须有 description** — Phase 1 就要确保语义清晰，description 会传递到 OpenAPI spec
 11. **每个 service 子目录必须包含 spec.md** — 记录服务目的、用途、方法需求、DTO 说明和变更记录，方便团队理解服务边界
 12. **fastmcp>=3.2.4 挂载到 FastAPI 需要 lifespan 合并** — `app.mount("/mcp", mcp.http_app(path="/"))` 会报 `Task group is not initialized`。必须：(1) 使用 `transport="streamable-http", stateless_http=True`；(2) 在 lifespan 函数定义之前创建 MCP http_app 对象；(3) 将 MCP http_app 的 lifespan 嵌套到 FastAPI lifespan 中（`async with mcp_http.lifespan(mcp_http):`）
+13. **methods.py 函数需通过 `_mount()` 桥接 classmethod 协议** — `query()`/`mutation()` 返回 `classmethod`，会自动注入 `cls` 参数。methods.py 中的独立函数不含 `cls`，直接用 `query(fn)` 挂载到 Entity 后调用会 TypeError。使用 `_mount()` 辅助函数包装一层 `async def wrapper(cls, *args, **kwargs): return await fn(*args, **kwargs)` 来桥接。`@functools.wraps(fn)` 保留 docstring，确保 GraphQL SDL 正确生成描述
 
 ## 需求文档管理
 
@@ -474,7 +492,7 @@ spec/<编号>-<需求简述>/
 3. **创建项目结构**: 目录 + pyproject.toml（依赖 sqlmodel-nexus）
 4. **Phase 1**:
    - **V 降**: 与用户确认验收标准表并写入 `spec/phase1.md#验收标准`
-   - **实现**: 生成 db.py + models.py + database.py(mock seed) + main.py(voyager)
+   - **实现**: 生成 db.py + models.py(纯实体，无方法) + database.py(mock seed) + main.py(voyager)
    - **V 升**: 逐条回查验收标准 → 通过后写入 `phase1.md` 完整内容 → **暂停等用户确认**
 5. **Phase 2**:
    - **V 降**: 与用户确认测试验收集（正常场景 + 边界异常）并写入 `spec/phase2.md#验收标准`

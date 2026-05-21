@@ -1,27 +1,28 @@
 # nexusx
 
-From prompt to POC, from POC to product.
+Build AI-friendly Application.
+
+From Idea to POC, from POC to Product.
 
 [![pypi](https://img.shields.io/pypi/v/nexusx.svg)](https://pypi.python.org/pypi/nexusx)
 [![PyPI Downloads](https://static.pepy.tech/badge/nexusx/month)](https://pepy.tech/projects/nexusx)
 ![Python Versions](https://img.shields.io/pypi/pyversion/nexusx)
 
-Build a codebase architecture that serves both humans and AI — from one model definition.
+nexusx is a model-first workflow for building AI-friendly applications.
 
-Define SQLModel entities once, then progressively expose them through GraphQL (human validation), REST + OpenAPI (frontend delivery), and MCP (AI agent integration). Entity relationships, DataLoader batching, and response DTOs are all derived from the same model declarations — no duplication, no drift.
+Start with an idea, turn it into a working POC quickly, then keep evolving the same model into production APIs instead of rebuilding the stack at each stage. You define SQLModel entities and relationships once, then use GraphQL to validate the model, REST + OpenAPI to ship typed frontend-facing APIs, and MCP to expose the same capabilities to AI agents.
 
 ```mermaid
 flowchart LR
-    model["SQLModel<br/>Entities + Relationships"]
-    model --> gql["GraphQL<br/>@query / @mutation<br/>DataLoader batching"]
-    model --> rest["REST API<br/>DefineSubset DTOs<br/>OpenAPI spec"]
-    model --> mcp["MCP Server<br/>Progressive-disclosure<br/>AI agent tools"]
-    model --> viz["Voyager<br/>Interactive ER diagram<br/>Service visualization"]
+    idea["Idea<br/>Entities, relationships,<br/>use cases"] --> model["SQLModel<br/>Single source of truth"]
+    model --> poc["POC<br/>GraphQL + Voyager<br/>Validate data shape fast"]
+    model --> product["Product<br/>REST + OpenAPI<br/>Typed frontend delivery"]
+    model --> ai["AI-friendly Layer<br/>MCP tools<br/>Agent integration"]
 ```
 
 ## Quick Start with AI Agent Skills
 
-This project ships a [skill](./skill/) that walks you through the full development lifecycle — from requirements confirmation to production deployment — in four phases. The skill uses the standard `SKILL.md` format supported by both Claude Code and OpenAI Codex.
+This project ships a [skill](./skill/) that operationalizes the same path described above: clarify the idea, build the POC, harden the product surface, then expose it cleanly for AI. The skill uses the standard `SKILL.md` format supported by both Claude Code and OpenAI Codex.
 
 ### Claude Code
 
@@ -51,35 +52,36 @@ Then start Codex and type `$nexusx-4phase` or describe your requirements to trig
 
 | Phase | Focus | Output |
 |-------|-------|--------|
-| Phase 0 | Requirements confirmation | Entities, relationships, aggregates, use-case methods |
-| Phase 1 | Schema + ER Diagram + seed data | models + db + voyager |
-| Phase 2 | Method implementation + Entity mounting | service methods, GraphQL queryable |
-| Phase 3 | UseCase response assembly + MCP | DTOs + services + REST + MCP |
+| Phase 0 | Clarify the idea | Entities, relationships, aggregates, use-case methods |
+| Phase 1 | Build the POC model | models + db + voyager |
+| Phase 2 | Make the model queryable | service methods, GraphQL queryable |
+| Phase 3 | Productize and make it AI-ready | DTOs + services + REST + MCP |
 
 Manual setup is also straightforward — see [Install](#install) below.
 
-## Why nexusx
+## From Idea to Product
 
-One model → four consumption paths, zero duplication:
+The core loop is simple: use one model to move through each delivery stage without rewriting your API surface.
 
 ```
-SQLModel Entities ──┬── GraphQL (validate relationships & data shapes)
-                    ├── REST API (typed endpoints for frontend)
-                    ├── MCP Server (AI agent interaction)
-                    └── Voyager (visual ER diagram for team & AI)
+Idea ──> SQLModel entities and relationships
+         ├── GraphQL for fast validation
+         ├── REST + OpenAPI for product delivery
+         ├── MCP for AI agents
+         └── Voyager for visualizing the system
 ```
 
 **GraphQL for validation, REST for delivery, MCP for AI.**
 
-During early development, GraphQL's flexible queries let you rapidly verify entity relationships and data shapes. When the model stabilizes, `DefineSubset` DTOs produce N+1-safe FastAPI endpoints with OpenAPI specs for frontend integration. The same models feed MCP servers that give AI agents structured access to your API — progressive disclosure from schema discovery to method execution.
+At the idea stage, you want feedback quickly: are the entities right, are the relationships right, does the shape of the response support the use case? GraphQL gives you that shortest path. Once the POC proves the model, `DefineSubset` DTOs and route generation turn the same entities into N+1-safe FastAPI endpoints with OpenAPI output, so frontend delivery stops depending on hand-written DTO duplication. When the product also needs to serve AI, the same model and service definitions can be exposed through MCP with progressive disclosure, from schema discovery to method execution.
 
 | Stage | What you get |
 |-------|-------------|
-| Model & Validate | `@query` / `@mutation` on SQLModel → auto-generated GraphQL API with DataLoader |
-| Build REST APIs | `DefineSubset` DTOs + `ErManager` → N+1-safe FastAPI endpoints |
-| Deliver to Frontend | openapi.json → TypeScript SDK |
-| AI Integration | MCP server exposing the same models to AI assistants |
-| Visualize | Voyager — interactive ER diagrams and service structure |
+| Idea | model entities, relationships, and use cases once in SQLModel |
+| POC | `@query` / `@mutation` + GraphQLHandler → quickly verify relationships and response shapes |
+| Product | `DefineSubset` DTOs + FastAPI/OpenAPI → stable typed APIs for frontend delivery |
+| AI-friendly Product | MCP server exposing the same model and service capabilities to AI assistants |
+| Team Understanding | Voyager gives a visual map of entities and service structure |
 
 ## Quick start
 
@@ -113,12 +115,12 @@ We reuse one example throughout: **Sprint → Task → User**.
 - A `Task` has one `owner` (a `User`)
 - The API also wants derived fields such as `task_count` and `contributors`
 
-The concepts appear in this order on purpose:
+The concepts appear in this order because they mirror the delivery path from idea to product:
 
-1. **GraphQL Mode** — the fastest path from SQLModel to a running API
+1. **GraphQL Mode** — the fastest path from SQLModel to a running POC
 2. **Core API Mode** — DefineSubset DTOs for REST endpoints, progressing from implicit auto-loading to `resolve_*`, `post_*`, and cross-layer data flow
-3. **MCP Server** — expose the same models to AI assistants
-4. **UseCase Services** — business service classes shared by MCP and web frameworks
+3. **MCP Server** — expose the same model and services to AI assistants
+4. **UseCase Services** — organize production business capabilities for MCP and web frameworks
 
 ## What nexusx Gives You
 

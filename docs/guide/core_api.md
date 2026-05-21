@@ -10,7 +10,7 @@ The simplest Core API usage: select fields from SQLModel entities, declare relat
 
 ```python
 from sqlmodel import SQLModel, select
-from sqlmodel_nexus import DefineSubset, ErManager
+from nexusx import DefineSubset, ErManager
 
 class UserDTO(DefineSubset):
     __subset__ = (User, ("id", "name"))

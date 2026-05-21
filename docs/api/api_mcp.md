@@ -7,7 +7,7 @@ Complete API reference for MCP service configuration.
 Create a single-app MCP service.
 
 ```python
-from sqlmodel_nexus.mcp import config_simple_mcp_server
+from nexusx.mcp import config_simple_mcp_server
 
 mcp = config_simple_mcp_server(
     base=SQLModel,              # SQLModel base class
@@ -37,7 +37,7 @@ mcp = config_simple_mcp_server(
 Create a multi-app MCP service.
 
 ```python
-from sqlmodel_nexus.mcp import create_mcp_server
+from nexusx.mcp import create_mcp_server
 
 mcp = create_mcp_server(
     apps=[

@@ -1,10 +1,10 @@
-# SQLModel Nexus
+# nexusx
 
 From prompt to POC, from POC to product.
 
-[![pypi](https://img.shields.io/pypi/v/sqlmodel-nexus.svg)](https://pypi.python.org/pypi/sqlmodel-nexus)
-[![PyPI Downloads](https://static.pepy.tech/badge/sqlmodel-nexus/month)](https://pepy.tech/projects/sqlmodel-nexus)
-![Python Versions](https://img.shields.io/pypi/pyversion/sqlmodel-nexus)
+[![pypi](https://img.shields.io/pypi/v/nexusx.svg)](https://pypi.python.org/pypi/nexusx)
+[![PyPI Downloads](https://static.pepy.tech/badge/nexusx/month)](https://pepy.tech/projects/nexusx)
+![Python Versions](https://img.shields.io/pypi/pyversion/nexusx)
 
 Build a codebase architecture that serves both humans and AI — from one model definition.
 
@@ -26,10 +26,10 @@ This project ships a [skill](./skill/) that walks you through the full developme
 ### Claude Code
 
 ```bash
-ln -s $(pwd)/skill ~/.claude/skills/sqlmodel-nexus-4phase
+ln -s $(pwd)/skill ~/.claude/skills/nexusx-4phase
 ```
 
-Then describe your requirements and invoke `/sqlmodel-nexus-4phase` to start.
+Then describe your requirements and invoke `/nexusx-4phase` to start.
 
 ### OpenAI Codex
 
@@ -37,17 +37,17 @@ Then describe your requirements and invoke `/sqlmodel-nexus-4phase` to start.
 
 ```bash
 mkdir -p .agents/skills
-ln -s ../../skill .agents/skills/sqlmodel-nexus-4phase
+ln -s ../../skill .agents/skills/nexusx-4phase
 ```
 
 **User-scope** (personal, works across all repos):
 
 ```bash
 mkdir -p ~/.agents/skills
-ln -s $(pwd)/skill ~/.agents/skills/sqlmodel-nexus-4phase
+ln -s $(pwd)/skill ~/.agents/skills/nexusx-4phase
 ```
 
-Then start Codex and type `$sqlmodel-nexus-4phase` or describe your requirements to trigger the skill implicitly.
+Then start Codex and type `$nexusx-4phase` or describe your requirements to trigger the skill implicitly.
 
 | Phase | Focus | Output |
 |-------|-------|--------|
@@ -58,7 +58,7 @@ Then start Codex and type `$sqlmodel-nexus-4phase` or describe your requirements
 
 Manual setup is also straightforward — see [Install](#install) below.
 
-## Why sqlmodel-nexus
+## Why nexusx
 
 One model → four consumption paths, zero duplication:
 
@@ -120,7 +120,7 @@ The concepts appear in this order on purpose:
 3. **MCP Server** — expose the same models to AI assistants
 4. **UseCase Services** — business service classes shared by MCP and web frameworks
 
-## What sqlmodel-nexus Gives You
+## What nexusx Gives You
 
 | Need | What you write | What the framework does |
 |------|----------------|-------------------------|
@@ -137,8 +137,8 @@ The concepts appear in this order on purpose:
 ## Install
 
 ```bash
-pip install sqlmodel-nexus
-pip install sqlmodel-nexus[fastmcp]  # with MCP support
+pip install nexusx
+pip install nexusx[fastmcp]  # with MCP support
 ```
 
 ---
@@ -154,7 +154,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship, select
-from sqlmodel_nexus import query, mutation, GraphQLHandler
+from nexusx import query, mutation, GraphQLHandler
 
 class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -250,7 +250,7 @@ handler = GraphQLHandler(base=SQLModel, session_factory=async_session, enable_pa
 Skip `@query` decorators entirely — let the framework generate `by_id` and `by_filter` for every entity:
 
 ```python
-from sqlmodel_nexus import GraphQLHandler, AutoQueryConfig
+from nexusx import GraphQLHandler, AutoQueryConfig
 
 handler = GraphQLHandler(
     base=SQLModel,
@@ -278,7 +278,7 @@ The simplest Core API case: select fields from SQLModel entities, declare relati
 
 ```python
 from sqlmodel import SQLModel
-from sqlmodel_nexus import DefineSubset, ErManager
+from nexusx import DefineSubset, ErManager
 
 class UserDTO(DefineSubset):
     __subset__ = (User, ("id", "name"))
@@ -392,7 +392,7 @@ Reach for these tools only when parent and child nodes need to coordinate.
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import ExposeAs, SendTo, Collector
+from nexusx import ExposeAs, SendTo, Collector
 
 class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))
@@ -421,7 +421,7 @@ Use this only when the shape of the tree matters:
 For relationships that aren't in the ORM (cross-service calls, computed edges), declare them on the entity:
 
 ```python
-from sqlmodel_nexus import Relationship
+from nexusx import Relationship
 
 async def tags_loader(task_ids: list[int]) -> list[list[Tag]]:
     """Batch load tags for multiple tasks."""
@@ -453,7 +453,7 @@ Expose your SQLModel APIs to AI assistants with one function call.
 ### Simple MCP Server
 
 ```python
-from sqlmodel_nexus.mcp import config_simple_mcp_server
+from nexusx.mcp import config_simple_mcp_server
 
 mcp = config_simple_mcp_server(base=SQLModel, name="My API")
 mcp.run()  # stdio mode
@@ -464,7 +464,7 @@ Tools: `get_schema()`, `graphql_query(query)`, `graphql_mutation(mutation)`.
 ### Multi-App MCP Server
 
 ```python
-from sqlmodel_nexus.mcp import create_mcp_server
+from nexusx.mcp import create_mcp_server
 
 mcp = create_mcp_server(
     apps=[
@@ -479,7 +479,7 @@ mcp.run()
 Tools include `list_apps()`, `list_queries(app_name)`, `get_query_schema(name, app_name)`, `graphql_query(query, app_name)`, etc.
 
 ```bash
-pip install sqlmodel-nexus[fastmcp]
+pip install nexusx[fastmcp]
 ```
 
 ---
@@ -493,7 +493,7 @@ Define business logic as service classes, expose them to both MCP and web framew
 `UseCaseService` subclasses declare methods decorated with `@query` / `@mutation`. The metaclass auto-discovers decorated methods.
 
 ```python
-from sqlmodel_nexus import UseCaseService, query, build_dto_select
+from nexusx import UseCaseService, query, build_dto_select
 
 class SprintService(UseCaseService):
     """Sprint management service."""
@@ -524,7 +524,7 @@ class SprintService(UseCaseService):
 Four-layer progressive disclosure: discover apps → discover services → inspect → execute.
 
 ```python
-from sqlmodel_nexus import create_use_case_mcp_server, UseCaseAppConfig
+from nexusx import create_use_case_mcp_server, UseCaseAppConfig
 
 mcp = create_use_case_mcp_server(
     apps=[
@@ -566,7 +566,7 @@ MCP tools provided:
 Use `create_use_case_router()` to generate POST routes from UseCaseService methods — zero boilerplate.
 
 ```python
-from sqlmodel_nexus import create_use_case_router, UseCaseAppConfig
+from nexusx import create_use_case_router, UseCaseAppConfig
 
 router = create_use_case_router(
     UseCaseAppConfig(

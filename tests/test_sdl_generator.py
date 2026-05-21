@@ -6,10 +6,10 @@ from typing import Optional
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
-from sqlmodel_nexus import SDLGenerator, mutation, query
-from sqlmodel_nexus.sdl_generator import _python_type_to_graphql
-from sqlmodel_nexus.type_converter import TypeConverter
-from sqlmodel_nexus.utils.schema_helpers import get_core_types, is_input_type
+from nexusx import SDLGenerator, mutation, query
+from nexusx.sdl_generator import _python_type_to_graphql
+from nexusx.type_converter import TypeConverter
+from nexusx.utils.schema_helpers import get_core_types, is_input_type
 
 
 # Define entities at module level to avoid metadata conflicts

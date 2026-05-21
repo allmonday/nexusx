@@ -7,7 +7,7 @@ UseCaseService、UseCaseAppConfig、create_use_case_mcp_server、create_use_case
 业务服务基类。子类声明 `async classmethod` 方法，元类自动发现公共方法。
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseService
+from nexusx.use_case import UseCaseService
 
 class SprintService(UseCaseService):
     """Sprint 管理服务。"""
@@ -38,7 +38,7 @@ class SprintService(UseCaseService):
 应用配置类，将一组 UseCaseService 组织为一个应用。
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseAppConfig
+from nexusx.use_case import UseCaseAppConfig
 
 config = UseCaseAppConfig(
     name="project",
@@ -61,7 +61,7 @@ config = UseCaseAppConfig(
 创建 UseCase 服务的 MCP 服务端，支持多应用和四层渐进式发现。
 
 ```python
-from sqlmodel_nexus.use_case import create_use_case_mcp_server, UseCaseAppConfig
+from nexusx.use_case import create_use_case_mcp_server, UseCaseAppConfig
 
 mcp = create_use_case_mcp_server(
     apps=[
@@ -96,7 +96,7 @@ mcp = create_use_case_mcp_server(
 创建 Voyager 可视化 ASGI 子应用。
 
 ```python
-from sqlmodel_nexus.voyager import create_use_case_voyager
+from nexusx.voyager import create_use_case_voyager
 
 voyager = create_use_case_voyager(
     apps=[
@@ -123,7 +123,7 @@ voyager = create_use_case_voyager(
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus.use_case import FromContext
+from nexusx.use_case import FromContext
 
 class SprintService(UseCaseService):
     @classmethod
@@ -136,7 +136,7 @@ class SprintService(UseCaseService):
 辅助函数，构建查询 DTO 所需字段的 SELECT 语句。
 
 ```python
-from sqlmodel_nexus import build_dto_select
+from nexusx import build_dto_select
 
 stmt = build_dto_select(SprintSummary)
 stmt = build_dto_select(SprintSummary, where=Sprint.id == sprint_id)

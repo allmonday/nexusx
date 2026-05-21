@@ -25,7 +25,7 @@ Authentication:
 from demo.auth.auth import MCPAuthMiddleware
 from demo.blog.database import async_session, init_db
 from demo.blog.models import BaseEntity
-from sqlmodel_nexus.mcp import create_mcp_server
+from nexusx.mcp import create_mcp_server
 
 
 async def lifespan(app):

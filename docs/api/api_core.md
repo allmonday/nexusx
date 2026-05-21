@@ -7,7 +7,7 @@ Complete API reference for ErManager, Resolver, DefineSubset, and Loader.
 Entity relationship manager — discovers entities, registers relationships, and creates Resolvers.
 
 ```python
-from sqlmodel_nexus import ErManager
+from nexusx import ErManager
 
 er = ErManager(
     base=SQLModel,                    # SQLModel base class (mutually exclusive with entities)
@@ -63,7 +63,7 @@ The `dtos` parameter can be a single DTO instance or a list of DTOs. Returns the
 DTO base class — generates Pydantic models from SQLModel entities.
 
 ```python
-from sqlmodel_nexus import DefineSubset
+from nexusx import DefineSubset
 
 class UserDTO(DefineSubset):
     __subset__ = (User, ("id", "name"))
@@ -84,7 +84,7 @@ Accepts a tuple `(Entity, ('field1', 'field2'))` or a `SubsetConfig` object.
 Declarative DTO configuration (alternative to `__subset__`):
 
 ```python
-from sqlmodel_nexus import SubsetConfig
+from nexusx import SubsetConfig
 
 class UserDTO(DefineSubset):
     __subset__ = SubsetConfig(entity=User, fields=("id", "name"))
@@ -95,7 +95,7 @@ class UserDTO(DefineSubset):
 Declare DataLoader dependencies in `resolve_*` methods.
 
 ```python
-from sqlmodel_nexus import Loader
+from nexusx import Loader
 
 # DataLoader class
 def resolve_tags(self, loader=Loader(TagLoader)):
@@ -115,7 +115,7 @@ def resolve_owner(self, loader=Loader(load_users)):
 Helper function that builds a SELECT statement for querying DTO fields from the SQL database:
 
 ```python
-from sqlmodel_nexus import build_dto_select
+from nexusx import build_dto_select
 
 stmt = build_dto_select(SprintSummary)
 stmt = build_dto_select(SprintSummary, where=Sprint.id == sprint_id)

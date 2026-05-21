@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from sqlmodel_nexus.loader.factories import (
+from nexusx.loader.factories import (
     _build_loader_identity,
     _normalize_identifier,
     create_many_to_one_loader,
@@ -194,7 +194,7 @@ class TestManyToManyLoader:
     @pytest.mark.usefixtures("test_db_m2m")
     async def test_batch_load_returns_correct_readers_per_article(self):
         """M2M loader should resolve readers through the link table."""
-        from sqlmodel_nexus.loader.factories import create_many_to_many_loader
+        from nexusx.loader.factories import create_many_to_many_loader
 
         session_factory = get_test_session_factory()
         meta = _get_secondary_table_and_columns()
@@ -228,7 +228,7 @@ class TestManyToManyLoader:
     @pytest.mark.usefixtures("test_db_m2m")
     async def test_batch_load_empty_for_no_links(self):
         """M2M loader should return empty list for article with no readers."""
-        from sqlmodel_nexus.loader.factories import create_many_to_many_loader
+        from nexusx.loader.factories import create_many_to_many_loader
 
         session_factory = get_test_session_factory()
         meta = _get_secondary_table_and_columns()
@@ -254,7 +254,7 @@ class TestManyToManyLoader:
         """M2M loader should work in reverse direction (reader -> articles)."""
         from sqlalchemy import inspect
 
-        from sqlmodel_nexus.loader.factories import create_many_to_many_loader
+        from nexusx.loader.factories import create_many_to_many_loader
         from tests.conftest import FixtureArticle, FixtureReader
 
         session_factory = get_test_session_factory()

@@ -5,7 +5,7 @@ from enum import Enum
 
 from sqlmodel import SQLModel
 
-from sqlmodel_nexus.type_converter import TypeConverter
+from nexusx.type_converter import TypeConverter
 
 
 class Status(Enum):

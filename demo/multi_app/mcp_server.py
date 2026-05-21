@@ -16,7 +16,7 @@ which application to use.
 
 import asyncio
 
-from sqlmodel_nexus.mcp import create_mcp_server
+from nexusx.mcp import create_mcp_server
 
 from .database import blog_async_session, shop_async_session
 from .models import BlogBaseEntity, ShopBaseEntity

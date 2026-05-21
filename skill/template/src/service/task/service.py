@@ -1,5 +1,5 @@
 """Task UseCaseService — task management with auto-loaded owner."""
-from sqlmodel_nexus import UseCaseService, mutation, query
+from nexusx import UseCaseService, mutation, query
 from src.models import Resolver
 from src.service.task.dtos import TaskSummary
 from src.service.task.methods import (

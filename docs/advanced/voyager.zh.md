@@ -1,12 +1,12 @@
 # Voyager 可视化进阶
 
-sqlmodel-nexus 内置 Voyager 模块，提供交互式的 UseCase 服务图和 ER 实体关系可视化。
+nexusx 内置 Voyager 模块，提供交互式的 UseCase 服务图和 ER 实体关系可视化。
 
 ## create_use_case_voyager
 
 ```python
-from sqlmodel_nexus.voyager import create_use_case_voyager
-from sqlmodel_nexus.use_case import UseCaseAppConfig
+from nexusx.voyager import create_use_case_voyager
+from nexusx.use_case import UseCaseAppConfig
 
 voyager = create_use_case_voyager(
     apps=[
@@ -97,8 +97,8 @@ class TaskDTO(DefineSubset):
 Voyager 展示的服务结构同时服务于 MCP 模式——AI 代理可以通过 MCP 工具发现和调用相同的服务：
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseAppConfig, create_use_case_mcp_server
-from sqlmodel_nexus.voyager import create_use_case_voyager
+from nexusx.use_case import UseCaseAppConfig, create_use_case_mcp_server
+from nexusx.voyager import create_use_case_voyager
 
 # 同一批应用配置
 apps = [

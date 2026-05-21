@@ -1,5 +1,5 @@
 """Sprint-related DTOs — SprintSummary with derived fields."""
-from sqlmodel_nexus import DefineSubset, SubsetConfig
+from nexusx import DefineSubset, SubsetConfig
 from src.models import Sprint
 from src.service.task.dtos import TaskSummary
 

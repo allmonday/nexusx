@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 from demo.blog.database import async_session, init_db
 from demo.blog.models import BaseEntity
-from sqlmodel_nexus import AutoQueryConfig, GraphQLHandler
+from nexusx import AutoQueryConfig, GraphQLHandler
 
 
 class GraphQLRequest(BaseModel):
@@ -42,8 +42,8 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI application
 app = FastAPI(
-    title="SQLModel Nexus Demo",
-    description="Demo application for SQLModel Nexus with GraphiQL interface",
+    title="nexusx Demo",
+    description="Demo application for nexusx with GraphiQL interface",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -84,7 +84,7 @@ async def get_schema():
 async def root():
     """Root endpoint with usage instructions."""
     return {
-        "message": "SQLModel Nexus Demo Server",
+        "message": "nexusx Demo Server",
         "endpoints": {
             "graphiql": "/graphql (GET - GraphiQL UI)",
             "graphql": "/graphql (POST - Query endpoint)",

@@ -1,6 +1,6 @@
 """Core API Demo — FastAPI application.
 
-Demonstrates sqlmodel-nexus's Core API mode:
+Demonstrates nexusx's Core API mode:
 - DefineSubset: independent DTOs from SQLModel entities
 - Implicit auto-loading: automatic relationship loading with ORM->DTO conversion
 - Resolver: model-driven traversal with resolve_/post_ methods
@@ -33,7 +33,7 @@ from demo.core_api.dtos import (
     TaskSummary,
 )
 from demo.core_api.models import Sprint, Tag, Task, User
-from sqlmodel_nexus import ErDiagram, ErManager, build_dto_select
+from nexusx import ErDiagram, ErManager, build_dto_select
 
 # ErManager inspects ORM metadata and creates DataLoaders for all
 # relationships between the provided entities.
@@ -52,7 +52,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Core API Demo",
-    description="sqlmodel-nexus Core API mode demo",
+    description="nexusx Core API mode demo",
     version="1.0.0",
     lifespan=lifespan,
 )

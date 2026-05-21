@@ -5,10 +5,10 @@ from __future__ import annotations
 import pytest
 from sqlmodel import SQLModel, select
 
-from sqlmodel_nexus.decorator import mutation, query
-from sqlmodel_nexus.execution.query_executor import QueryExecutor
-from sqlmodel_nexus.loader.registry import ErManager, RelationshipInfo
-from sqlmodel_nexus.query_parser import FieldSelection, QueryParser
+from nexusx.decorator import mutation, query
+from nexusx.execution.query_executor import QueryExecutor
+from nexusx.loader.registry import ErManager, RelationshipInfo
+from nexusx.query_parser import FieldSelection, QueryParser
 from tests.conftest import (
     FixtureSprint,
     FixtureTask,

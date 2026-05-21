@@ -1,10 +1,10 @@
 [project]
-name = "sqlmodel-nexus-template"
+name = "nexusx-template"
 version = "0.1.0"
-description = "sqlmodel-nexus 四阶段开发模板"
+description = "nexusx 四阶段开发模板"
 requires-python = ">=3.12"
 dependencies = [
-    "sqlmodel-nexus>=1.6.0",
+    "nexusx>=1.6.0",
     "fastapi",
     "uvicorn",
     "sqlmodel",

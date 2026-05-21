@@ -8,11 +8,11 @@ import pytest
 from graphql import parse
 from sqlmodel import SQLModel, select
 
-from sqlmodel_nexus.decorator import query
-from sqlmodel_nexus.execution.argument_builder import ArgumentBuilder
-from sqlmodel_nexus.execution.query_executor import QueryExecutor
-from sqlmodel_nexus.loader.registry import ErManager
-from sqlmodel_nexus.query_parser import QueryParser
+from nexusx.decorator import query
+from nexusx.execution.argument_builder import ArgumentBuilder
+from nexusx.execution.query_executor import QueryExecutor
+from nexusx.loader.registry import ErManager
+from nexusx.query_parser import QueryParser
 from tests.conftest import FixtureUser, get_test_session_factory
 
 

@@ -7,7 +7,7 @@
 当字段名不匹配关系，或需要自定义逻辑时，使用 `resolve_*`：
 
 ```python
-from sqlmodel_nexus import Loader
+from nexusx import Loader
 
 async def comments_loader(task_ids: list[int]) -> list[list[Comment]]:
     """批量加载多个 task 的 comments。"""
@@ -82,7 +82,7 @@ class SprintDTO(DefineSubset):
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import ExposeAs
+from nexusx import ExposeAs
 
 class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))
@@ -93,7 +93,7 @@ class SprintDTO(DefineSubset):
 ### SendTo + Collector：后代 → 祖先
 
 ```python
-from sqlmodel_nexus import SendTo, Collector
+from nexusx import SendTo, Collector
 
 class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))

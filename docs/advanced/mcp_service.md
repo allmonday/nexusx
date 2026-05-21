@@ -5,7 +5,7 @@ Expose SQLModel APIs to AI agents — create an MCP service with a single line o
 ## Installation
 
 ```bash
-pip install sqlmodel-nexus[fastmcp]
+pip install nexusx[fastmcp]
 ```
 
 ## Simple MCP Server
@@ -13,7 +13,7 @@ pip install sqlmodel-nexus[fastmcp]
 The simplest mode — pass a SQLModel base class:
 
 ```python
-from sqlmodel_nexus.mcp import config_simple_mcp_server
+from nexusx.mcp import config_simple_mcp_server
 
 mcp = config_simple_mcp_server(
     base=SQLModel,
@@ -35,7 +35,7 @@ Provided tools:
 Manage APIs for multiple applications:
 
 ```python
-from sqlmodel_nexus.mcp import create_mcp_server
+from nexusx.mcp import create_mcp_server
 
 mcp = create_mcp_server(
     apps=[

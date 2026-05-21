@@ -7,7 +7,7 @@ Relationship 和 ErDiagram 的完整 API 参考。
 自定义（非 ORM）关系声明。
 
 ```python
-from sqlmodel_nexus import Relationship
+from nexusx import Relationship
 
 class Task(SQLModel, table=True):
     __relationships__ = [
@@ -48,7 +48,7 @@ Relationship(fk="id", target=list[Tag], name="tags", loader=tags_loader)
 Mermaid ER 图生成。
 
 ```python
-from sqlmodel_nexus import ErDiagram
+from nexusx import ErDiagram
 
 diagram = ErDiagram(entities=[Sprint, Task, User])
 ```

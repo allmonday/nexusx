@@ -17,8 +17,8 @@ skip them on re-encounter, breaking the recursion cycle.
 """
 from sqlmodel import Field, SQLModel
 
-from sqlmodel_nexus import DefineSubset, SubsetConfig
-from sqlmodel_nexus.voyager.type_helper import update_forward_refs
+from nexusx import DefineSubset, SubsetConfig
+from nexusx.voyager.type_helper import update_forward_refs
 
 # ── Minimal self-referencing setup ─────────────────────────────────────
 

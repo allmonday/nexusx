@@ -25,7 +25,7 @@ RPC 模块已全面重构为 UseCase 模式。主要变化：
 
 ```python
 # Before (rpc)
-from sqlmodel_nexus.rpc import RpcService, create_rpc_mcp_server
+from nexusx.rpc import RpcService, create_rpc_mcp_server
 
 class SprintService(RpcService):
     ...
@@ -36,7 +36,7 @@ mcp = create_rpc_mcp_server(
 )
 
 # After (use_case)
-from sqlmodel_nexus.use_case import UseCaseService, UseCaseAppConfig, create_use_case_mcp_server
+from nexusx.use_case import UseCaseService, UseCaseAppConfig, create_use_case_mcp_server
 
 class SprintService(UseCaseService):
     ...
@@ -65,7 +65,7 @@ mcp = create_use_case_mcp_server(
 
 ```python
 # Before (1.3.x)
-from sqlmodel_nexus import RpcServiceConfig, create_rpc_mcp_server
+from nexusx import RpcServiceConfig, create_rpc_mcp_server
 
 mcp = create_rpc_mcp_server(
     services=[
@@ -75,7 +75,7 @@ mcp = create_rpc_mcp_server(
 )
 
 # After (1.4.0)
-from sqlmodel_nexus import create_rpc_mcp_server
+from nexusx import create_rpc_mcp_server
 
 mcp = create_rpc_mcp_server(
     services=[TaskService, SprintService],

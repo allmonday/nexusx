@@ -8,7 +8,7 @@ Exposes ancestor fields to descendant nodes, accessible via `ancestor_context`.
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import ExposeAs
+from nexusx import ExposeAs
 
 class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))
@@ -37,7 +37,7 @@ Sends descendant field values to an ancestor's Collector.
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import SendTo
+from nexusx import SendTo
 
 class TaskDTO(DefineSubset):
     __subset__ = (Task, ("id", "title", "owner_id"))
@@ -55,7 +55,7 @@ class TaskDTO(DefineSubset):
 Receives values sent by descendants via `SendTo` in `post_*` methods.
 
 ```python
-from sqlmodel_nexus import Collector
+from nexusx import Collector
 
 class SprintDTO(DefineSubset):
     contributors: list[UserDTO] = []

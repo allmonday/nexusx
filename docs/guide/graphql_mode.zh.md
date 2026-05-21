@@ -5,7 +5,7 @@
 ## GraphQLHandler 配置
 
 ```python
-from sqlmodel_nexus import GraphQLHandler
+from nexusx import GraphQLHandler
 
 handler = GraphQLHandler(
     base=SQLModel,          # SQLModel 基类，用于自动发现实体
@@ -20,7 +20,7 @@ handler = GraphQLHandler(
 在 SQLModel 实体上标记查询和变更方法：
 
 ```python
-from sqlmodel_nexus import query, mutation
+from nexusx import query, mutation
 
 class Post(SQLModel, table=True):
     # ... 字段定义 ...

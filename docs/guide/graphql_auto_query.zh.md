@@ -5,7 +5,7 @@
 ## AutoQueryConfig
 
 ```python
-from sqlmodel_nexus import GraphQLHandler, AutoQueryConfig
+from nexusx import GraphQLHandler, AutoQueryConfig
 
 handler = GraphQLHandler(
     base=SQLModel,
@@ -17,7 +17,7 @@ handler = GraphQLHandler(
 也可以手动注册：
 
 ```python
-from sqlmodel_nexus import add_standard_queries
+from nexusx import add_standard_queries
 
 add_standard_queries(handler, AutoQueryConfig(session_factory=async_session))
 ```

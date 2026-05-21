@@ -13,12 +13,12 @@ from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel
 
 # ── MCP apps (must be created before lifespan to combine lifespans) ───
-from sqlmodel_nexus import (  # noqa: E402
+from nexusx import (  # noqa: E402
     GraphQLHandler,
     UseCaseAppConfig,
     create_use_case_mcp_server,
 )
-from sqlmodel_nexus.mcp import create_mcp_server  # noqa: E402
+from nexusx.mcp import create_mcp_server  # noqa: E402
 from src.database import init_db
 from src.db import async_session
 from src.models import BaseEntity, er, mount_method  # noqa: E402
@@ -77,7 +77,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="sqlmodel-nexus Template",
+    title="nexusx Template",
     version="0.1.0",
     lifespan=lifespan,
 )
@@ -93,7 +93,7 @@ app.add_middleware(
 
 # ── Voyager visualization (Phase 1: ER diagram only) ──────────────────
 
-from sqlmodel_nexus import create_use_case_voyager  # noqa: E402
+from nexusx import create_use_case_voyager  # noqa: E402
 
 voyager_app = create_use_case_voyager(
     services=[],  # Phase 3: add UseCaseService classes here

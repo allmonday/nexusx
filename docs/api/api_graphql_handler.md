@@ -5,7 +5,7 @@ Core entry point for GraphQL mode — SDL generation, query execution, and Graph
 ## GraphQLHandler
 
 ```python
-from sqlmodel_nexus import GraphQLHandler
+from nexusx import GraphQLHandler
 
 handler = GraphQLHandler(
     base=SQLModel,                    # SQLModel base class (auto-discover entities)
@@ -34,7 +34,7 @@ handler = GraphQLHandler(
 ## @query Decorator
 
 ```python
-from sqlmodel_nexus import query
+from nexusx import query
 
 class Post(SQLModel, table=True):
     @query
@@ -51,7 +51,7 @@ class Post(SQLModel, table=True):
 ## @mutation Decorator
 
 ```python
-from sqlmodel_nexus import mutation
+from nexusx import mutation
 
 class Post(SQLModel, table=True):
     @mutation
@@ -65,7 +65,7 @@ Same rules as `@query`.
 ## AutoQueryConfig
 
 ```python
-from sqlmodel_nexus import AutoQueryConfig
+from nexusx import AutoQueryConfig
 
 config = AutoQueryConfig(session_factory=async_session)
 ```
@@ -85,7 +85,7 @@ Query parsing result type, representing a field and its sub-selections in a Grap
 Manually register auto queries to an existing GraphQLHandler:
 
 ```python
-from sqlmodel_nexus import add_standard_queries
+from nexusx import add_standard_queries
 
 add_standard_queries(handler, AutoQueryConfig(session_factory=async_session))
 ```

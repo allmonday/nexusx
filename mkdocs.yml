@@ -1,6 +1,6 @@
-site_name: SQLModel Nexus
+site_name: nexusx
 site_description: "Progressive SQLModel extension — from ER diagrams to GraphQL API and beyond."
-site_url: https://allmonday.github.io/sqlmodel-nexus
+site_url: https://allmonday.github.io/nexusx
 site_author: tangkikodo
 theme:
   name: material
@@ -45,8 +45,8 @@ theme:
     text: Roboto
     code: Roboto Mono
 
-repo_name: allmonday/sqlmodel-nexus
-repo_url: https://github.com/allmonday/sqlmodel-nexus
+repo_name: allmonday/nexusx
+repo_url: https://github.com/allmonday/nexusx
 edit_uri: ""
 
 exclude_docs: |
@@ -98,11 +98,11 @@ plugins:
           default: true
           name: English
           build: true
-          link: "/sqlmodel-nexus/"
+          link: "/nexusx/"
         - locale: zh
           name: 中文
           build: true
-          link: "/sqlmodel-nexus/zh/"
+          link: "/nexusx/zh/"
           nav_translations:
             Guide: "指南"
             Advanced: "进阶"

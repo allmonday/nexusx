@@ -5,10 +5,10 @@ from __future__ import annotations
 import pytest
 from sqlmodel import Field, SQLModel
 
-from sqlmodel_nexus import DefineSubset, ErDiagram, Relationship
-from sqlmodel_nexus.loader.registry import ErManager
-from sqlmodel_nexus.relationship import get_custom_relationships
-from sqlmodel_nexus.resolver import Resolver
+from nexusx import DefineSubset, ErDiagram, Relationship
+from nexusx.loader.registry import ErManager
+from nexusx.relationship import get_custom_relationships
+from nexusx.resolver import Resolver
 from tests.conftest import FixtureSprint, FixtureTask, FixtureUser
 
 # ──────────────────────────────────────────────────────────

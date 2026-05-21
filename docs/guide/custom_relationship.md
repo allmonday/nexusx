@@ -15,7 +15,7 @@ In standard scenarios, SQLModel's `Relationship` and `Field(foreign_key=...)` al
 Declare in the `__relationships__` list on SQLModel entities:
 
 ```python
-from sqlmodel_nexus import Relationship
+from nexusx import Relationship
 
 async def tags_loader(task_ids: list[int]) -> list[list[Tag]]:
     """Batch load tags."""

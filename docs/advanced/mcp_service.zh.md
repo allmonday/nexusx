@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-pip install sqlmodel-nexus[fastmcp]
+pip install nexusx[fastmcp]
 ```
 
 ## Simple MCP Server
@@ -13,7 +13,7 @@ pip install sqlmodel-nexus[fastmcp]
 最简模式——传入 SQLModel 基类即可：
 
 ```python
-from sqlmodel_nexus.mcp import config_simple_mcp_server
+from nexusx.mcp import config_simple_mcp_server
 
 mcp = config_simple_mcp_server(
     base=SQLModel,
@@ -35,7 +35,7 @@ mcp.run()  # stdio 模式
 管理多个应用的 API：
 
 ```python
-from sqlmodel_nexus.mcp import create_mcp_server
+from nexusx.mcp import create_mcp_server
 
 mcp = create_mcp_server(
     apps=[

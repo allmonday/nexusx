@@ -14,7 +14,7 @@ UseCaseService subclass ──┬── MCP server (AI agents, four-layer progre
 `UseCaseService` subclasses declare `async classmethod` methods. The metaclass auto-discovers public methods:
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseService
+from nexusx.use_case import UseCaseService
 
 class SprintService(UseCaseService):
     """Sprint management service."""
@@ -45,7 +45,7 @@ class SprintService(UseCaseService):
 Four-layer progressive discovery: app discovery → service list → method details → execution.
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseAppConfig, create_use_case_mcp_server
+from nexusx.use_case import UseCaseAppConfig, create_use_case_mcp_server
 
 mcp = create_use_case_mcp_server(
     apps=[

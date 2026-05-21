@@ -1,5 +1,5 @@
 """Sprint UseCaseService — sprint management with task statistics."""
-from sqlmodel_nexus import UseCaseService, mutation, query
+from nexusx import UseCaseService, mutation, query
 from src.models import Resolver
 from src.service.sprint.dtos import SprintSummary
 from src.service.sprint.methods import (

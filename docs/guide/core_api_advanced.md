@@ -7,7 +7,7 @@ When implicit auto-loading is not enough, Core API provides three progressive ca
 When the field name doesn't match a relationship, or custom logic is needed, use `resolve_*`:
 
 ```python
-from sqlmodel_nexus import Loader
+from nexusx import Loader
 
 async def comments_loader(task_ids: list[int]) -> list[list[Comment]]:
     """Batch load comments for multiple tasks."""
@@ -82,7 +82,7 @@ Use when parent and child nodes need cross-layer collaboration. Only necessary w
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import ExposeAs
+from nexusx import ExposeAs
 
 class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))
@@ -93,7 +93,7 @@ class SprintDTO(DefineSubset):
 ### SendTo + Collector: Descendant → Ancestor
 
 ```python
-from sqlmodel_nexus import SendTo, Collector
+from nexusx import SendTo, Collector
 
 class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))

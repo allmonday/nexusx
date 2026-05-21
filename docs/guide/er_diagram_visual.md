@@ -1,6 +1,6 @@
 # ER Diagram Visualization
 
-sqlmodel-nexus provides two visualization approaches: **Mermaid text output** (suitable for embedding in documentation) and **Voyager interactive visualization** (suitable for development debugging and team collaboration).
+nexusx provides two visualization approaches: **Mermaid text output** (suitable for embedding in documentation) and **Voyager interactive visualization** (suitable for development debugging and team collaboration).
 
 ## Option 1: Mermaid Text Output
 
@@ -9,7 +9,7 @@ Suitable for embedding in READMEs, PRs, Wikis, and other static documentation.
 ### ErDiagram Class
 
 ```python
-from sqlmodel_nexus import ErDiagram
+from nexusx import ErDiagram
 
 # From ErManager
 diagram = er.get_diagram()
@@ -54,13 +54,13 @@ GitHub, GitLab, and most Markdown renderers support Mermaid syntax.
 
 ## Option 2: Voyager Interactive Visualization
 
-sqlmodel-nexus includes a built-in Voyager module that provides web-based interactive visualization, showing both UseCase service structure and ER entity relationships.
+nexusx includes a built-in Voyager module that provides web-based interactive visualization, showing both UseCase service structure and ER entity relationships.
 
 ### Quick Start
 
 ```python
-from sqlmodel_nexus.voyager import create_use_case_voyager
-from sqlmodel_nexus.use_case import UseCaseAppConfig
+from nexusx.voyager import create_use_case_voyager
+from nexusx.use_case import UseCaseAppConfig
 from fastapi import FastAPI
 
 # Create Voyager application

@@ -10,7 +10,7 @@ Usage:
 
 from demo.blog.database import async_session
 from demo.blog.models import BaseEntity
-from sqlmodel_nexus.mcp import create_mcp_server
+from nexusx.mcp import create_mcp_server
 
 
 def main() -> None:

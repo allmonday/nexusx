@@ -7,7 +7,7 @@ ErManager、Resolver、DefineSubset、Loader 的完整 API 参考。
 实体关系管理器——发现实体、注册关系、创建 Resolver。
 
 ```python
-from sqlmodel_nexus import ErManager
+from nexusx import ErManager
 
 er = ErManager(
     base=SQLModel,                    # SQLModel 基类（与 entities 互斥）
@@ -63,7 +63,7 @@ result = await Resolver().resolve(dtos)
 DTO 基类——从 SQLModel 实体生成 Pydantic 模型。
 
 ```python
-from sqlmodel_nexus import DefineSubset
+from nexusx import DefineSubset
 
 class UserDTO(DefineSubset):
     __subset__ = (User, ("id", "name"))
@@ -84,7 +84,7 @@ class UserDTO(DefineSubset):
 声明式 DTO 配置（`__subset__` 的替代形式）：
 
 ```python
-from sqlmodel_nexus import SubsetConfig
+from nexusx import SubsetConfig
 
 class UserDTO(DefineSubset):
     __subset__ = SubsetConfig(entity=User, fields=("id", "name"))
@@ -95,7 +95,7 @@ class UserDTO(DefineSubset):
 在 `resolve_*` 方法中声明 DataLoader 依赖。
 
 ```python
-from sqlmodel_nexus import Loader
+from nexusx import Loader
 
 # DataLoader 类
 def resolve_tags(self, loader=Loader(TagLoader)):
@@ -115,7 +115,7 @@ def resolve_owner(self, loader=Loader(load_users)):
 辅助函数，构建从 SQL 数据库查询 DTO 所需字段的 SELECT 语句：
 
 ```python
-from sqlmodel_nexus import build_dto_select
+from nexusx import build_dto_select
 
 stmt = build_dto_select(SprintSummary)
 stmt = build_dto_select(SprintSummary, where=Sprint.id == sprint_id)

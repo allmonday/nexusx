@@ -1,1 +1,1 @@
-"""SQLModel Nexus Demo application."""
+"""nexusx Demo application."""

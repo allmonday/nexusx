@@ -10,14 +10,14 @@ from decimal import Decimal
 import pytest
 from pydantic import BaseModel
 
-from sqlmodel_nexus.decorator import mutation, query
-from sqlmodel_nexus.use_case.business import UseCaseService
-from sqlmodel_nexus.use_case.introspector import (
+from nexusx.decorator import mutation, query
+from nexusx.use_case.business import UseCaseService
+from nexusx.use_case.introspector import (
     ServiceIntrospector,
     _type_to_sdl_name,
 )
-from sqlmodel_nexus.use_case.server import create_use_case_mcp_server
-from sqlmodel_nexus.use_case.types import UseCaseAppConfig
+from nexusx.use_case.server import create_use_case_mcp_server
+from nexusx.use_case.types import UseCaseAppConfig
 
 # ──────────────────────────────────────────────────
 # Test DTOs

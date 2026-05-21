@@ -6,8 +6,8 @@ from typing import Optional
 import pytest
 from sqlmodel import Field, Relationship, SQLModel
 
-from sqlmodel_nexus import GraphQLHandler, mutation, query
-from sqlmodel_nexus.introspection import IntrospectionGenerator
+from nexusx import GraphQLHandler, mutation, query
+from nexusx.introspection import IntrospectionGenerator
 
 
 class IntrospectionBase(SQLModel):

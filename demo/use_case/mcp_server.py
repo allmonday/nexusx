@@ -17,7 +17,7 @@ Usage:
 from demo.core_api.database import async_session, init_db
 from demo.core_api.dtos import SprintDetail, SprintSummary, TaskSummary
 from demo.core_api.models import Sprint, Task, User
-from sqlmodel_nexus import (
+from nexusx import (
     ErManager,
     UseCaseAppConfig,
     UseCaseService,

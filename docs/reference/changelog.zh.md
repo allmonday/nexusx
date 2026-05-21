@@ -38,4 +38,4 @@
 
 ---
 
-完整变更记录请查看 [GitHub 上的 CHANGELOG.md](https://github.com/allmonday/sqlmodel-nexus/blob/master/CHANGELOG.md)。
+完整变更记录请查看 [GitHub 上的 CHANGELOG.md](https://github.com/allmonday/nexusx/blob/master/CHANGELOG.md)。

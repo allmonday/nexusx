@@ -993,6 +993,84 @@ wheels = [
 ]
 
 [[package]]
+name = "nexusx"
+version = "1.10.1"
+source = { editable = "." }
+dependencies = [
+    { name = "aiodataloader" },
+    { name = "fastapi" },
+    { name = "graphql-core" },
+    { name = "greenlet" },
+    { name = "jinja2" },
+    { name = "pydantic" },
+    { name = "sqlmodel" },
+    { name = "uvicorn" },
+]
+
+[package.optional-dependencies]
+demo = [
+    { name = "aiosqlite" },
+    { name = "fastapi" },
+    { name = "greenlet" },
+    { name = "uvicorn" },
+]
+dev = [
+    { name = "aiosqlite" },
+    { name = "greenlet" },
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+]
+fastmcp = [
+    { name = "fastmcp" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "aiosqlite" },
+    { name = "fastmcp" },
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiodataloader", specifier = ">=0.4.3" },
+    { name = "aiosqlite", marker = "extra == 'demo'", specifier = ">=0.19.0" },
+    { name = "aiosqlite", marker = "extra == 'dev'", specifier = ">=0.19.0" },
+    { name = "fastapi", specifier = ">=0.135.1" },
+    { name = "fastapi", marker = "extra == 'demo'", specifier = ">=0.100.0" },
+    { name = "fastmcp", marker = "extra == 'fastmcp'", specifier = ">=3.1,<3.2" },
+    { name = "graphql-core", specifier = ">=3.2.0" },
+    { name = "greenlet", specifier = ">=3.3.2" },
+    { name = "greenlet", marker = "extra == 'demo'", specifier = ">=3.3.2" },
+    { name = "greenlet", marker = "extra == 'dev'", specifier = ">=3.3.2" },
+    { name = "jinja2", specifier = ">=3.0" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
+    { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "sqlmodel", specifier = ">=0.0.14" },
+    { name = "uvicorn", specifier = ">=0.41.0" },
+    { name = "uvicorn", marker = "extra == 'demo'", specifier = ">=0.23.0" },
+]
+provides-extras = ["dev", "demo", "fastmcp"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "aiosqlite", specifier = ">=0.19.0" },
+    { name = "fastmcp", specifier = ">=3.1.1" },
+    { name = "mypy", specifier = ">=1.19.1" },
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "pytest-asyncio", specifier = ">=1.3.0" },
+    { name = "ruff", specifier = ">=0.15.4" },
+]
+
+[[package]]
 name = "openapi-pydantic"
 version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1696,84 +1774,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fb/26/1d2faa0fd5a765267f49751de533adac6b9ff9366c7c6e7692df4f32230f/sqlmodel-0.0.37.tar.gz", hash = "sha256:d2c19327175794faf50b1ee31cc966764f55b1dedefc046450bc5741a3d68352", size = 85527, upload-time = "2026-02-21T16:39:47.038Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b1/e1/7c8d18e737433f3b5bbe27b56a9072a9fcb36342b48f1bef34b6da1d61f2/sqlmodel-0.0.37-py3-none-any.whl", hash = "sha256:2137a4045ef3fd66a917a7717ada959a1ceb3630d95e1f6aaab39dd2c0aef278", size = 27224, upload-time = "2026-02-21T16:39:47.781Z" },
-]
-
-[[package]]
-name = "sqlmodel-nexus"
-version = "1.10.1"
-source = { editable = "." }
-dependencies = [
-    { name = "aiodataloader" },
-    { name = "fastapi" },
-    { name = "graphql-core" },
-    { name = "greenlet" },
-    { name = "jinja2" },
-    { name = "pydantic" },
-    { name = "sqlmodel" },
-    { name = "uvicorn" },
-]
-
-[package.optional-dependencies]
-demo = [
-    { name = "aiosqlite" },
-    { name = "fastapi" },
-    { name = "greenlet" },
-    { name = "uvicorn" },
-]
-dev = [
-    { name = "aiosqlite" },
-    { name = "greenlet" },
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-]
-fastmcp = [
-    { name = "fastmcp" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "aiosqlite" },
-    { name = "fastmcp" },
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiodataloader", specifier = ">=0.4.3" },
-    { name = "aiosqlite", marker = "extra == 'demo'", specifier = ">=0.19.0" },
-    { name = "aiosqlite", marker = "extra == 'dev'", specifier = ">=0.19.0" },
-    { name = "fastapi", specifier = ">=0.135.1" },
-    { name = "fastapi", marker = "extra == 'demo'", specifier = ">=0.100.0" },
-    { name = "fastmcp", marker = "extra == 'fastmcp'", specifier = ">=3.1,<3.2" },
-    { name = "graphql-core", specifier = ">=3.2.0" },
-    { name = "greenlet", specifier = ">=3.3.2" },
-    { name = "greenlet", marker = "extra == 'demo'", specifier = ">=3.3.2" },
-    { name = "greenlet", marker = "extra == 'dev'", specifier = ">=3.3.2" },
-    { name = "jinja2", specifier = ">=3.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
-    { name = "sqlmodel", specifier = ">=0.0.14" },
-    { name = "uvicorn", specifier = ">=0.41.0" },
-    { name = "uvicorn", marker = "extra == 'demo'", specifier = ">=0.23.0" },
-]
-provides-extras = ["dev", "demo", "fastmcp"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "aiosqlite", specifier = ">=0.19.0" },
-    { name = "fastmcp", specifier = ">=3.1.1" },
-    { name = "mypy", specifier = ">=1.19.1" },
-    { name = "pytest", specifier = ">=9.0.2" },
-    { name = "pytest-asyncio", specifier = ">=1.3.0" },
-    { name = "ruff", specifier = ">=0.15.4" },
 ]
 
 [[package]]

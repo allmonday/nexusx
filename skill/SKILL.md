@@ -1,12 +1,12 @@
 ---
-name: sqlmodel-nexus-4phase
-description: 基于 sqlmodel-nexus 的四阶段开发模式，从 Schema 建模到 API 响应组装再到 TS SDK 的完整项目构建流程。
+name: nexusx-4phase
+description: 基于 nexusx 的四阶段开发模式，从 Schema 建模到 API 响应组装再到 TS SDK 的完整项目构建流程。
 argument-hint: "[项目路径] 创建四阶段项目的目标目录"
 ---
 
-# sqlmodel-nexus 四阶段开发模式
+# nexusx 四阶段开发模式
 
-基于 sqlmodel-nexus 的渐进式开发方法论。项目在一个 `src/` 目录下逐步演进，每个阶段在上一阶段基础上新增代码。
+基于 nexusx 的渐进式开发方法论。项目在一个 `src/` 目录下逐步演进，每个阶段在上一阶段基础上新增代码。
 
 | Phase | 职责 | 产出 |
 |-------|------|------|
@@ -184,7 +184,7 @@ service/<domain>/methods.py  ← 独立定义业务逻辑（核心）
 **注意事项**：
 - 优先使用 FastAPI 生态内的主流方案，减少集成风险
 - 如果用户指定了某个库，必须先调查其维护状态和兼容性，发现问题要及时告知用户并提供替代方案
-- 对于 sqlmodel-nexus 已覆盖的领域（ORM、GraphQL、MCP），不再重复讨论
+- 对于 nexusx 已覆盖的领域（ORM、GraphQL、MCP），不再重复讨论
 
 **必须与用户确认每个领域的选型后才能继续。**
 
@@ -246,7 +246,7 @@ fe/                 # Phase 4 前端 SDK
 
 **新增/修改文件**:
 - `db.py` — aiosqlite engine + session_factory（不导入 models，避免循环依赖）
-- `models.py` — 纯 SQLModel 实体 + Relationship（仅字段和关系，不含方法，不导入 `sqlmodel_nexus`）。所有 Relationship 必须加 `sa_relationship_kwargs={"lazy": "noload"}`
+- `models.py` — 纯 SQLModel 实体 + Relationship（仅字段和关系，不含方法，不导入 `nexusx`）。所有 Relationship 必须加 `sa_relationship_kwargs={"lazy": "noload"}`
 - `database.py` — mock seed data（从 `db.py` 导入 engine/session，从 `models.py` 导入实体）
 - `main.py` — FastAPI + Voyager（ER diagram 可视化）
 
@@ -273,7 +273,7 @@ fe/                 # Phase 4 前端 SDK
 按验收标准逐条验证，用户确认后才写入 `spec/phase1.md`：
 
 - [ ] 1. Voyager ER 图：实体节点、关系线、聚合根高亮
-- [ ] 2. Entity 纯字段：无 @query/@mutation 方法，无 `sqlmodel_nexus` 导入
+- [ ] 2. Entity 纯字段：无 @query/@mutation 方法，无 `nexusx` 导入
 - [ ] 3. mock seed：数据量合理、关联关系正确、包含边界用例
 
 ### Phase 2: 方法实现 + Entity 挂载
@@ -292,7 +292,7 @@ fe/                 # Phase 4 前端 SDK
   def mount_method():
       """挂载 service methods 到 entity classes。需在外部显式调用。"""
       import functools
-      from sqlmodel_nexus import mutation, query
+      from nexusx import mutation, query
       from src.service.user.methods import list_users, create_user
 
       def _mount(entity, fn, decorator):
@@ -365,7 +365,7 @@ fe/                 # Phase 4 前端 SDK
   - **service.py 不直接操作数据库**（无 `build_dto_select`、`async_session`）
 - **`create_use_case_router()` 自动生成 REST 路由** — 从 UseCaseAppConfig 生成 POST 路由，自动提取 `response_model`、构建 request body model、注册路由。不需要手写 `router/` 目录
   ```python
-  from sqlmodel_nexus import UseCaseAppConfig, create_use_case_router
+  from nexusx import UseCaseAppConfig, create_use_case_router
   use_case_router = create_use_case_router(
       UseCaseAppConfig(
           name="project",
@@ -561,7 +561,7 @@ spec/<编号>-<需求简述>/
 
 1. **创建 spec 目录**: 用户首次描述需求时，在项目根目录创建 `spec/<编号>-<需求简述>/`，将用户原始需求写入 `story.md`，预建 phase0 ~ phase4 空文件
 2. **Phase 0 需求确认**: 按 Step 0-1 ~ 0-6 逐步与用户确认实体、关系、聚合根、用例方法、第三方库 → 确认后写入 `phase0.md` → **补充 `story.md` 的 Overview Design 部分** → **用户全部确认后才继续**
-3. **创建项目结构**: 目录 + pyproject.toml（依赖 sqlmodel-nexus）
+3. **创建项目结构**: 目录 + pyproject.toml（依赖 nexusx）
 4. **Phase 1**:
    - **V 降**: 与用户确认验收标准表并写入 `spec/phase1.md#验收标准`
    - **实现**: 生成 db.py + models.py(纯实体，无方法) + database.py(mock seed) + main.py(voyager)

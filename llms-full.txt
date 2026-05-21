@@ -1,6 +1,6 @@
-# sqlmodel-nexus — LLM Reference
+# nexusx — LLM Reference
 
-> sqlmodel-nexus：从 SQLModel 类自动生成 GraphQL API，提供 Core API 声明式数据组装，以及 MCP 服务。
+> nexusx：从 SQLModel 类自动生成 GraphQL API，提供 Core API 声明式数据组装，以及 MCP 服务。
 > 渐进式框架 — ER Diagram → GraphQL API → 声明式数据组装。
 
 版本：1.3.1 | Python >= 3.10 | 许可证：MIT
@@ -49,8 +49,8 @@
 ## 2. 安装
 
 ```bash
-pip install sqlmodel-nexus
-pip install sqlmodel-nexus[fastmcp]  # 包含 MCP 支持
+pip install nexusx
+pip install nexusx[fastmcp]  # 包含 MCP 支持
 ```
 
 ---
@@ -62,7 +62,7 @@ pip install sqlmodel-nexus[fastmcp]  # 包含 MCP 支持
 将 class method 标记为 GraphQL 查询。
 
 ```python
-from sqlmodel_nexus import query
+from nexusx import query
 
 class User(BaseEntity, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -87,7 +87,7 @@ class User(BaseEntity, table=True):
 与 `@query` 用法相同，标记为 GraphQL mutation。
 
 ```python
-from sqlmodel_nexus import mutation
+from nexusx import mutation
 
 class User(BaseEntity, table=True):
     @mutation
@@ -119,7 +119,7 @@ class User(BaseEntity, table=True):
 核心类，负责实体发现、SDL 生成、查询执行。
 
 ```python
-from sqlmodel_nexus import GraphQLHandler, AutoQueryConfig
+from nexusx import GraphQLHandler, AutoQueryConfig
 
 handler = GraphQLHandler(
     base=BaseEntity,                           # 必填：SQLModel 基类
@@ -170,7 +170,7 @@ html: str = handler.get_graphiql_html(endpoint="/graphql")
 自动为所有实体生成标准查询。
 
 ```python
-from sqlmodel_nexus import AutoQueryConfig
+from nexusx import AutoQueryConfig
 
 config = AutoQueryConfig(
     session_factory=async_session,    # 必填
@@ -197,7 +197,7 @@ config = AutoQueryConfig(
 #### 单应用 MCP Server
 
 ```python
-from sqlmodel_nexus.mcp import config_simple_mcp_server
+from nexusx.mcp import config_simple_mcp_server
 
 mcp = config_simple_mcp_server(
     base=BaseEntity,
@@ -231,7 +231,7 @@ uvicorn.run(mcp_app, host="0.0.0.0", port=8006)
 #### 多应用 MCP Server
 
 ```python
-from sqlmodel_nexus.mcp import create_mcp_server, AppConfig
+from nexusx.mcp import create_mcp_server, AppConfig
 
 mcp = create_mcp_server(
     apps=[
@@ -251,7 +251,7 @@ mcp.run()
 从 SQLModel 实体生成独立的 Pydantic DTO 模型。选择特定字段，自动隐藏 FK 列，并支持声明关系字段。
 
 ```python
-from sqlmodel_nexus import DefineSubset
+from nexusx import DefineSubset
 
 # 基本用法：选择字段
 class UserSummary(DefineSubset):
@@ -319,7 +319,7 @@ class TaskSummary(DefineSubset):
 `DefineSubset` 的声明式配置，替代 `__subset__` 元组语法。支持更丰富的字段控制。
 
 ```python
-from sqlmodel_nexus import DefineSubset, SubsetConfig
+from nexusx import DefineSubset, SubsetConfig
 
 class UserSummary(DefineSubset):
     __subset__ = SubsetConfig(
@@ -378,7 +378,7 @@ class UserPublic(DefineSubset):
 实体关系管理器。检查 SQLModel ORM 元数据，自动发现关系，创建 DataLoader，生成 Resolver。
 
 ```python
-from sqlmodel_nexus import ErManager
+from nexusx import ErManager
 
 # 方式一：通过基类自动发现实体
 er = ErManager(base=SQLModel, session_factory=async_session)
@@ -443,7 +443,7 @@ er.get_relationship(entity=User, name='posts')  # → RelationshipInfo | None
 
 ```python
 # 完整使用示例
-from sqlmodel_nexus import DefineSubset, ErManager
+from nexusx import DefineSubset, ErManager
 
 er = ErManager(base=SQLModel, session_factory=async_session)
 Resolver = er.create_resolver()
@@ -460,7 +460,7 @@ result = await resolver.resolve([
 在 `resolve_*` 方法参数中声明 DataLoader 依赖。
 
 ```python
-from sqlmodel_nexus import Loader
+from nexusx import Loader
 
 class PostSummary(DefineSubset):
     __subset__ = (Post, ('id', 'title', 'author_id'))
@@ -494,7 +494,7 @@ class PostSummary(DefineSubset):
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import ExposeAs
+from nexusx import ExposeAs
 
 class SprintDetail(DefineSubset):
     __subset__ = (Sprint, ('id', 'name'))
@@ -516,7 +516,7 @@ class TaskDetail(DefineSubset):
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import SendTo, Collector
+from nexusx import SendTo, Collector
 
 class SprintDetail(DefineSubset):
     __subset__ = (Sprint, ('id', 'name'))
@@ -574,7 +574,7 @@ class TaskDetail(DefineSubset):
 定义自定义（非 ORM）关系。用于没有 SQLAlchemy Relationship 的关联，通过手写 async 批量加载器实现。
 
 ```python
-from sqlmodel_nexus import Relationship
+from nexusx import Relationship
 
 async def tags_by_post_loader(post_ids: list[int]) -> list[list[Tag]]:
     """加载 post 的标签。签名：list[KEY] → list[list[TARGET]]"""
@@ -627,7 +627,7 @@ class TaskWithTags(DefineSubset):
 从 SQLModel 实体生成 Mermaid ER 图。
 
 ```python
-from sqlmodel_nexus import ErDiagram
+from nexusx import ErDiagram
 
 diagram = ErDiagram.from_sqlmodel(entities=[User, Post, Comment])
 print(diagram.to_mermaid())
@@ -658,7 +658,7 @@ erDiagram
 业务服务基类。子类定义的 async classmethod 会被自动发现并暴露为 RPC 方法。
 
 ```python
-from sqlmodel_nexus import RpcService
+from nexusx import RpcService
 
 class SprintService(RpcService):
     """Sprint management service."""
@@ -700,7 +700,7 @@ async def get_tasks():
 **RPC MCP Server：**
 
 ```python
-from sqlmodel_nexus import create_rpc_mcp_server
+from nexusx import create_rpc_mcp_server
 
 # services 参数接受 list[dict] 或 list[RpcServiceConfig]
 # 两种写法等价：
@@ -715,7 +715,7 @@ mcp = create_rpc_mcp_server(
 )
 
 # 写法二：RpcServiceConfig TypedDict
-from sqlmodel_nexus.rpc import RpcServiceConfig
+from nexusx.rpc import RpcServiceConfig
 
 mcp = create_rpc_mcp_server(
     services=[
@@ -740,7 +740,7 @@ mcp.run()
 创建交互式可视化 FastAPI 子应用，展示 RPC 服务结构和 ER 图。
 
 ```python
-from sqlmodel_nexus import create_rpc_voyager
+from nexusx import create_rpc_voyager
 
 voyager_app = create_rpc_voyager(
     services=[
@@ -836,7 +836,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, select
-from sqlmodel_nexus import query, GraphQLHandler
+from nexusx import query, GraphQLHandler
 
 class BaseEntity(SQLModel): pass
 
@@ -906,7 +906,7 @@ class Post(BaseEntity, table=True):
 ### 模式 C：AutoQueryConfig 零手写查询
 
 ```python
-from sqlmodel_nexus import GraphQLHandler, AutoQueryConfig
+from nexusx import GraphQLHandler, AutoQueryConfig
 
 handler = GraphQLHandler(
     base=BaseEntity,
@@ -926,7 +926,7 @@ handler = GraphQLHandler(
 ### 模式 D：MCP 服务
 
 ```python
-from sqlmodel_nexus.mcp import config_simple_mcp_server
+from nexusx.mcp import config_simple_mcp_server
 
 mcp = config_simple_mcp_server(
     base=BaseEntity,
@@ -949,7 +949,7 @@ AI 助手使用流程：
 ```python
 from fastapi import FastAPI
 from sqlmodel import SQLModel, Field, Relationship
-from sqlmodel_nexus import DefineSubset, SubsetConfig, ErManager
+from nexusx import DefineSubset, SubsetConfig, ErManager
 
 # 实体定义
 class User(SQLModel, table=True):
@@ -991,7 +991,7 @@ async def get_tasks():
 使用 ExposeAs + SendTo + Collector 实现父子节点协作。
 
 ```python
-from sqlmodel_nexus import DefineSubset, SubsetConfig, Collector, ErManager
+from nexusx import DefineSubset, SubsetConfig, Collector, ErManager
 
 class UserSummary(DefineSubset):
     __subset__ = SubsetConfig(kls=User, fields=['id', 'name'])
@@ -1041,7 +1041,7 @@ result = await resolver.resolve([
 
 ```python
 from fastapi import FastAPI
-from sqlmodel_nexus import RpcService, create_rpc_mcp_server, create_rpc_voyager
+from nexusx import RpcService, create_rpc_mcp_server, create_rpc_voyager
 
 class SprintService(RpcService):
     """Sprint management."""
@@ -1205,7 +1205,7 @@ resolver.resolve(dtos)
 根据 DefineSubset DTO 的字段定义，生成只包含所需列的 SQL SELECT 语句（而非 `SELECT *`）。
 
 ```python
-from sqlmodel_nexus import build_dto_select
+from nexusx import build_dto_select
 
 # 参数：dto_class（DefineSubset 子类）、where（可选过滤条件）
 # 返回：SQLModel select 语句，仅包含 DTO __subset__ 中定义的列

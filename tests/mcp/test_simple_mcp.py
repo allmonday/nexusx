@@ -7,9 +7,9 @@ import inspect
 import pytest
 from sqlmodel import Field, SQLModel
 
-from sqlmodel_nexus import mutation, query
-from sqlmodel_nexus.mcp import config_simple_mcp_server
-from sqlmodel_nexus.mcp.managers.single_app_manager import SingleAppManager
+from nexusx import mutation, query
+from nexusx.mcp import config_simple_mcp_server
+from nexusx.mcp.managers.single_app_manager import SingleAppManager
 
 
 def _get_tools_dict(mcp):
@@ -288,7 +288,7 @@ class TestConfigSimpleMCPServer:
         """Test creating simple MCP server with defaults."""
         mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
 
-        assert mcp.name == "SQLModel Nexus API"
+        assert mcp.name == "nexusx API"
 
     def test_config_simple_mcp_server_tools_registered(self) -> None:
         """Test that only 2 tools are registered by default (allow_mutation=False)."""

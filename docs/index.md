@@ -2,11 +2,11 @@
 template: home.html
 ---
 
-# sqlmodel-nexus
+# nexusx
 
-**sqlmodel-nexus** is a progressive SQLModel extension library. Start from ORM entities, extend with non-ORM relationships, auto-generate GraphQL APIs, and use `DefineSubset` to declaratively build response DTOs. Visualize entity relationships and data flows through ER diagrams.
+**nexusx** is a progressive SQLModel extension library. Start from ORM entities, extend with non-ORM relationships, auto-generate GraphQL APIs, and use `DefineSubset` to declaratively build response DTOs. Visualize entity relationships and data flows through ER diagrams.
 
-## What sqlmodel-nexus Solves
+## What nexusx Solves
 
 | Need | What You Write | What the Framework Handles |
 |------|----------------|---------------------------|

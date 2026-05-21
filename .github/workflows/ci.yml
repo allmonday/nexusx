@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     paths:
-      - 'src/sqlmodel_nexus/**'
+      - 'src/nexusx/**'
       - 'tests/**'
       - 'pyproject.toml'
 

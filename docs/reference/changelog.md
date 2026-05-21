@@ -38,4 +38,4 @@ Fixed `IntrospectionGenerator` default value serialization, changing from Python
 
 ---
 
-For the complete changelog, see [CHANGELOG.md on GitHub](https://github.com/allmonday/sqlmodel-nexus/blob/master/CHANGELOG.md).
+For the complete changelog, see [CHANGELOG.md on GitHub](https://github.com/allmonday/nexusx/blob/master/CHANGELOG.md).

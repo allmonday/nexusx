@@ -30,7 +30,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from demo.core_api.database import async_session, init_db
 from demo.core_api.models import Task, User
 from demo.use_case.mcp_server import SprintService, TaskService, UserService
-from sqlmodel_nexus import (
+from nexusx import (
     FromContext,
     UseCaseAppConfig,
     UseCaseService,

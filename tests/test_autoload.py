@@ -7,9 +7,9 @@ from aiodataloader import DataLoader
 from pydantic import BaseModel
 from sqlmodel import select
 
-from sqlmodel_nexus.loader.registry import ErManager
-from sqlmodel_nexus.resolver import Depends, Loader, Resolver
-from sqlmodel_nexus.subset import DefineSubset
+from nexusx.loader.registry import ErManager
+from nexusx.resolver import Depends, Loader, Resolver
+from nexusx.subset import DefineSubset
 from tests.conftest import (
     FixtureSprint,
     FixtureTask,

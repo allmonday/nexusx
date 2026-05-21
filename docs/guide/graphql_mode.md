@@ -5,7 +5,7 @@ From SQLModel entities to a complete GraphQL API — SDL auto-generation, automa
 ## GraphQLHandler Configuration
 
 ```python
-from sqlmodel_nexus import GraphQLHandler
+from nexusx import GraphQLHandler
 
 handler = GraphQLHandler(
     base=SQLModel,          # SQLModel base class for auto-discovering entities
@@ -20,7 +20,7 @@ handler = GraphQLHandler(
 Mark query and mutation methods on SQLModel entities:
 
 ```python
-from sqlmodel_nexus import query, mutation
+from nexusx import query, mutation
 
 class Post(SQLModel, table=True):
     # ... field definitions ...

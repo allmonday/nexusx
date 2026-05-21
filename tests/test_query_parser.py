@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from sqlmodel_nexus.query_parser import FieldSelection, QueryParser
+from nexusx.query_parser import FieldSelection, QueryParser
 
 
 class TestQueryParserBasic:

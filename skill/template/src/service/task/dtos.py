@@ -1,5 +1,5 @@
 """Task-related DTOs — UserSummary, TaskSummary."""
-from sqlmodel_nexus import DefineSubset, SubsetConfig
+from nexusx import DefineSubset, SubsetConfig
 from src.models import Task, User
 
 

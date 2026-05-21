@@ -15,7 +15,7 @@
 在 SQLModel 实体的 `__relationships__` 列表中声明：
 
 ```python
-from sqlmodel_nexus import Relationship
+from nexusx import Relationship
 
 async def tags_loader(task_ids: list[int]) -> list[list[Tag]]:
     """批量加载 tags。"""

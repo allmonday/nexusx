@@ -72,7 +72,7 @@ def mount_method():
     """挂载 service methods 到 entity classes。需在外部显式调用。"""
     import functools
 
-    from sqlmodel_nexus import mutation, query
+    from nexusx import mutation, query
     from src.service.sprint.methods import create_sprint, list_sprints
     from src.service.task.methods import create_task, get_tasks_by_sprint, list_tasks
     from src.service.user.methods import create_user, list_users
@@ -94,7 +94,7 @@ def mount_method():
 
 # ── ErManager + Resolver (Phase 3) ──────────────────────────────────────
 
-from sqlmodel_nexus import ErManager  # noqa: E402
+from nexusx import ErManager  # noqa: E402
 
 er = ErManager(
     entities=[User, Sprint, Task],

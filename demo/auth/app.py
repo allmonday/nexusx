@@ -25,7 +25,7 @@ from pydantic import BaseModel
 from demo.auth.auth import require_admin
 from demo.blog.database import async_session, init_db
 from demo.blog.models import BaseEntity
-from sqlmodel_nexus import GraphQLHandler
+from nexusx import GraphQLHandler
 
 
 class GraphQLRequest(BaseModel):
@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI application
 app = FastAPI(
-    title="SQLModel Nexus Auth Demo",
+    title="nexusx Auth Demo",
     description="Demo application with API Key authentication for GraphQL endpoints",
     version="1.0.0",
     lifespan=lifespan,
@@ -94,7 +94,7 @@ async def get_schema(_: str = Depends(require_admin)):
 async def root():
     """Root endpoint with usage instructions."""
     return {
-        "message": "SQLModel Nexus Auth Demo Server",
+        "message": "nexusx Auth Demo Server",
         "authentication": {
             "type": "API Key",
             "header": "X-API-Key",

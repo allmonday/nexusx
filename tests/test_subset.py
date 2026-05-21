@@ -8,8 +8,8 @@ import pytest
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
-from sqlmodel_nexus.context import scan_expose_fields
-from sqlmodel_nexus.subset import (
+from nexusx.context import scan_expose_fields
+from nexusx.subset import (
     SUBSET_REFERENCE,
     DefineSubset,
     get_subset_source,
@@ -163,7 +163,7 @@ class TestDefineSubsetExtraFields:
         """Subset fields can be re-annotated with metadata (e.g., ExposeAs)."""
 
 
-        from sqlmodel_nexus.context import ExposeAs
+        from nexusx.context import ExposeAs
 
         class ReAnnotatedSubset(DefineSubset):
             __subset__ = (SampleUser, ("id", "name"))
@@ -305,7 +305,7 @@ class TestSQLModelRelationshipTypeValidation:
     def test_sqlmodel_in_annotated_raises(self):
         """Using Annotated[Entity, ...] should raise TypeError."""
 
-        from sqlmodel_nexus import SendTo
+        from nexusx import SendTo
 
         with pytest.raises(TypeError, match="must use a DTO type"):
 
@@ -358,7 +358,7 @@ class TestSQLModelRelationshipTypeValidation:
 class TestSubsetConfig:
     def test_config_with_fields(self):
         """SubsetConfig(fields=[...]) basic usage."""
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -375,7 +375,7 @@ class TestSubsetConfig:
     def test_config_with_omit_fields(self):
         """SubsetConfig(omit_fields=[...]) inverse selection."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -390,7 +390,7 @@ class TestSubsetConfig:
     def test_config_with_fields_all(self):
         """SubsetConfig(fields='all') includes all fields."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -403,7 +403,7 @@ class TestSubsetConfig:
     def test_config_with_omit_empty(self):
         """SubsetConfig(omit_fields=[]) is equivalent to fields='all'."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -416,7 +416,7 @@ class TestSubsetConfig:
     def test_config_with_excluded_fields(self):
         """excluded_fields should set exclude=True and hide from serialization."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -433,7 +433,7 @@ class TestSubsetConfig:
     def test_config_with_expose_as(self):
         """expose_as should add ExposeInfo metadata to fields."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -448,8 +448,8 @@ class TestSubsetConfig:
     def test_config_with_send_to(self):
         """send_to should add SendToInfo metadata to fields."""
 
-        from sqlmodel_nexus.context import scan_send_to_fields
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.context import scan_send_to_fields
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -465,8 +465,8 @@ class TestSubsetConfig:
     def test_config_with_send_to_tuple(self):
         """send_to with tuple of collector names."""
 
-        from sqlmodel_nexus.context import scan_send_to_fields
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.context import scan_send_to_fields
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -481,7 +481,7 @@ class TestSubsetConfig:
     def test_config_fields_and_omit_exclusive(self):
         """fields + omit_fields both specified should raise ValueError."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         with pytest.raises(ValueError, match="exclusive"):
             SubsetConfig(
@@ -493,7 +493,7 @@ class TestSubsetConfig:
     def test_config_missing_both(self):
         """Neither fields nor omit_fields should raise ValueError."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         with pytest.raises(ValueError, match="must be provided"):
             SubsetConfig(kls=SampleUser)
@@ -501,7 +501,7 @@ class TestSubsetConfig:
     def test_config_with_extra_fields(self):
         """SubsetConfig + class body extra fields should coexist."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -516,7 +516,7 @@ class TestSubsetConfig:
     def test_config_source_registration(self):
         """SubsetConfig-based DTO should register source entity."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -529,7 +529,7 @@ class TestSubsetConfig:
     def test_config_with_sqlmodel_table_true(self):
         """SubsetConfig with table=True entity (with relationships)."""
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class TaskDTO(DefineSubset):
             __subset__ = SubsetConfig(
@@ -556,8 +556,8 @@ class TestSubsetConfigIntegration:
         """SubsetConfig expose_as should work through Resolver end-to-end."""
         from sqlmodel import select
 
-        from sqlmodel_nexus.resolver import Resolver
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.resolver import Resolver
+        from nexusx.subset import SubsetConfig
 
         class ChildDTO(DefineSubset):
             __subset__ = SubsetConfig(
@@ -595,10 +595,10 @@ class TestSubsetConfigIntegration:
         """SubsetConfig send_to on an extra field should collect through Resolver."""
         from sqlmodel import select
 
-        from sqlmodel_nexus.context import Collector
-        from sqlmodel_nexus.loader.registry import ErManager
-        from sqlmodel_nexus.resolver import Resolver
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.context import Collector
+        from nexusx.loader.registry import ErManager
+        from nexusx.resolver import Resolver
+        from nexusx.subset import SubsetConfig
         from tests.conftest import init_test_db, seed_test_data
         await init_test_db()
         await seed_test_data()
@@ -647,10 +647,10 @@ class TestSubsetConfigIntegration:
         """SubsetConfig expose_as + send_to should work together in Resolver."""
         from sqlmodel import select
 
-        from sqlmodel_nexus.context import Collector
-        from sqlmodel_nexus.loader.registry import ErManager
-        from sqlmodel_nexus.resolver import Resolver
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.context import Collector
+        from nexusx.loader.registry import ErManager
+        from nexusx.resolver import Resolver
+        from nexusx.subset import SubsetConfig
         from tests.conftest import init_test_db, seed_test_data
         await init_test_db()
         await seed_test_data()
@@ -709,7 +709,7 @@ class TestSubsetConfigIntegration:
         """SubsetConfig excluded_fields should hide fields from model_dump."""
         from sqlmodel import select
 
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.subset import SubsetConfig
 
         class TaskDTO(DefineSubset):
             __subset__ = SubsetConfig(
@@ -734,9 +734,9 @@ class TestSubsetConfigIntegration:
         """SubsetConfig fields='all' should include all scalar fields + implicit AutoLoad."""
         from sqlmodel import select
 
-        from sqlmodel_nexus.loader.registry import ErManager
-        from sqlmodel_nexus.resolver import Resolver
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.loader.registry import ErManager
+        from nexusx.resolver import Resolver
+        from nexusx.subset import SubsetConfig
         from tests.conftest import init_test_db, seed_test_data
         await init_test_db()
         await seed_test_data()
@@ -783,9 +783,9 @@ class TestSubsetConfigIntegration:
         """SubsetConfig send_to on a subset field (not extra) should work."""
         from sqlmodel import select
 
-        from sqlmodel_nexus.context import Collector
-        from sqlmodel_nexus.resolver import Resolver
-        from sqlmodel_nexus.subset import SubsetConfig
+        from nexusx.context import Collector
+        from nexusx.resolver import Resolver
+        from nexusx.subset import SubsetConfig
 
         class TaskDTO(DefineSubset):
             __subset__ = SubsetConfig(
@@ -823,7 +823,7 @@ class TestSubsetConfigIntegration:
 class TestBuildDtoSelect:
     def test_basic_column_selection(self):
         """build_dto_select should select only the DTO's subset columns."""
-        from sqlmodel_nexus.subset import SubsetConfig, build_dto_select
+        from nexusx.subset import SubsetConfig, build_dto_select
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(kls=FixtureUser, fields=["id", "name"])
@@ -836,7 +836,7 @@ class TestBuildDtoSelect:
 
     def test_fk_field_included_in_select(self):
         """FK fields should appear in the select statement."""
-        from sqlmodel_nexus.subset import SubsetConfig, build_dto_select
+        from nexusx.subset import SubsetConfig, build_dto_select
 
         class TaskSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -849,7 +849,7 @@ class TestBuildDtoSelect:
 
     def test_relationship_fields_filtered(self):
         """Relationship field names should be excluded from the select."""
-        from sqlmodel_nexus.subset import SubsetConfig, build_dto_select
+        from nexusx.subset import SubsetConfig, build_dto_select
 
         # FixtureTask has 'sprint' and 'owner' as relationship fields
         class TaskSub(DefineSubset):
@@ -864,7 +864,7 @@ class TestBuildDtoSelect:
 
     def test_with_where_clause(self):
         """build_dto_select with where should include the filter."""
-        from sqlmodel_nexus.subset import SubsetConfig, build_dto_select
+        from nexusx.subset import SubsetConfig, build_dto_select
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(kls=FixtureUser, fields=["id", "name"])
@@ -875,14 +875,14 @@ class TestBuildDtoSelect:
 
     def test_non_define_subset_raises(self):
         """Passing a non-DefineSubset class should raise ValueError."""
-        from sqlmodel_nexus.subset import build_dto_select
+        from nexusx.subset import build_dto_select
 
         with pytest.raises(ValueError, match="not a DefineSubset DTO"):
             build_dto_select(BaseModel)
 
     def test_plain_pydantic_model_raises(self):
         """A plain Pydantic model without __subset_fields__ should raise."""
-        from sqlmodel_nexus.subset import build_dto_select
+        from nexusx.subset import build_dto_select
 
         class MyModel(BaseModel):
             x: int
@@ -893,7 +893,7 @@ class TestBuildDtoSelect:
     @pytest.mark.usefixtures("test_db")
     async def test_end_to_end_query_and_conversion(self):
         """build_dto_select should produce a statement that works with session.exec."""
-        from sqlmodel_nexus.subset import SubsetConfig, build_dto_select
+        from nexusx.subset import SubsetConfig, build_dto_select
 
         class TaskSub(DefineSubset):
             __subset__ = SubsetConfig(
@@ -916,7 +916,7 @@ class TestBuildDtoSelect:
     @pytest.mark.usefixtures("test_db")
     async def test_with_where_returns_subset(self):
         """build_dto_select with where should filter results."""
-        from sqlmodel_nexus.subset import SubsetConfig, build_dto_select
+        from nexusx.subset import SubsetConfig, build_dto_select
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(kls=FixtureUser, fields=["id", "name"])
@@ -934,9 +934,9 @@ class TestBuildDtoSelect:
     @pytest.mark.usefixtures("test_db")
     async def test_with_resolver_integration(self):
         """build_dto_select + dict(row._mapping) + Resolver should work end-to-end."""
-        from sqlmodel_nexus.loader.registry import ErManager
-        from sqlmodel_nexus.resolver import Resolver
-        from sqlmodel_nexus.subset import SubsetConfig, build_dto_select
+        from nexusx.loader.registry import ErManager
+        from nexusx.resolver import Resolver
+        from nexusx.subset import SubsetConfig, build_dto_select
 
         class UserSub(DefineSubset):
             __subset__ = SubsetConfig(kls=FixtureUser, fields=["id", "name"])

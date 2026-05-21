@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from demo.blog.database import async_session, init_db
 from demo.blog.models import BaseEntity
-from sqlmodel_nexus import AutoQueryConfig, GraphQLHandler
+from nexusx import AutoQueryConfig, GraphQLHandler
 
 
 class GraphQLRequest(BaseModel):
@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="SQLModel Nexus Demo (Paginated)",
+    title="nexusx Demo (Paginated)",
     description="Demo with enable_pagination=True — lists wrapped in Page types",
     version="1.0.0",
     lifespan=lifespan,
@@ -84,7 +84,7 @@ async def get_schema():
 async def root():
     """Root endpoint with usage instructions and pagination examples."""
     return {
-        "message": "SQLModel Nexus Demo (Paginated)",
+        "message": "nexusx Demo (Paginated)",
         "endpoints": {
             "graphiql": "/graphql (GET - GraphiQL UI)",
             "graphql": "/graphql (POST - Query endpoint)",

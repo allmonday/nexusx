@@ -5,7 +5,7 @@ From SQLModel entities to a working GraphQL API in 30 seconds.
 ## Installation
 
 ```bash
-pip install sqlmodel-nexus
+pip install nexusx
 ```
 
 ## 1. Define SQLModel Entities
@@ -29,7 +29,7 @@ class Post(SQLModel, table=True):
 ## 2. Add @query and @mutation
 
 ```python
-from sqlmodel_nexus import query, mutation
+from nexusx import query, mutation
 
 class Post(SQLModel, table=True):
     # ... fields as above ...
@@ -57,7 +57,7 @@ class Post(SQLModel, table=True):
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from sqlmodel_nexus import GraphQLHandler
+from nexusx import GraphQLHandler
 
 handler = GraphQLHandler(base=SQLModel, session_factory=async_session)
 

@@ -1,12 +1,12 @@
 # Voyager Visualization Advanced
 
-sqlmodel-nexus includes a built-in Voyager module that provides interactive UseCase service graphs and ER entity relationship visualization.
+nexusx includes a built-in Voyager module that provides interactive UseCase service graphs and ER entity relationship visualization.
 
 ## create_use_case_voyager
 
 ```python
-from sqlmodel_nexus.voyager import create_use_case_voyager
-from sqlmodel_nexus.use_case import UseCaseAppConfig
+from nexusx.voyager import create_use_case_voyager
+from nexusx.use_case import UseCaseAppConfig
 
 voyager = create_use_case_voyager(
     apps=[
@@ -97,8 +97,8 @@ In Voyager, this displays the `TaskDTO` → `Task` subset relationship along wit
 The service structure displayed by Voyager also serves the MCP mode — AI agents can discover and call the same services via MCP tools:
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseAppConfig, create_use_case_mcp_server
-from sqlmodel_nexus.voyager import create_use_case_voyager
+from nexusx.use_case import UseCaseAppConfig, create_use_case_mcp_server
+from nexusx.voyager import create_use_case_voyager
 
 # Same set of app configurations
 apps = [

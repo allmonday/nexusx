@@ -8,7 +8,7 @@ ExposeAs、SendTo、Collector 的完整 API 参考。
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import ExposeAs
+from nexusx import ExposeAs
 
 class SprintDTO(DefineSubset):
     __subset__ = (Sprint, ("id", "name"))
@@ -37,7 +37,7 @@ class TaskDTO(DefineSubset):
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus import SendTo
+from nexusx import SendTo
 
 class TaskDTO(DefineSubset):
     __subset__ = (Task, ("id", "title", "owner_id"))
@@ -55,7 +55,7 @@ class TaskDTO(DefineSubset):
 在 `post_*` 方法中接收后代通过 `SendTo` 发送的值。
 
 ```python
-from sqlmodel_nexus import Collector
+from nexusx import Collector
 
 class SprintDTO(DefineSubset):
     contributors: list[UserDTO] = []

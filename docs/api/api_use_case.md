@@ -7,7 +7,7 @@ Complete API reference for UseCaseService, UseCaseAppConfig, create_use_case_mcp
 Business service base class. Subclasses declare `async classmethod` methods; the metaclass auto-discovers public methods.
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseService
+from nexusx.use_case import UseCaseService
 
 class SprintService(UseCaseService):
     """Sprint management service."""
@@ -38,7 +38,7 @@ class SprintService(UseCaseService):
 Application configuration class that organizes a group of UseCaseServices into one application.
 
 ```python
-from sqlmodel_nexus.use_case import UseCaseAppConfig
+from nexusx.use_case import UseCaseAppConfig
 
 config = UseCaseAppConfig(
     name="project",
@@ -61,7 +61,7 @@ config = UseCaseAppConfig(
 Create an MCP server for UseCase services, supporting multi-app and four-layer progressive discovery.
 
 ```python
-from sqlmodel_nexus.use_case import create_use_case_mcp_server, UseCaseAppConfig
+from nexusx.use_case import create_use_case_mcp_server, UseCaseAppConfig
 
 mcp = create_use_case_mcp_server(
     apps=[
@@ -96,7 +96,7 @@ mcp = create_use_case_mcp_server(
 Create a Voyager visualization ASGI sub-application.
 
 ```python
-from sqlmodel_nexus.voyager import create_use_case_voyager
+from nexusx.voyager import create_use_case_voyager
 
 voyager = create_use_case_voyager(
     apps=[
@@ -123,7 +123,7 @@ Marker annotation for injecting parameters from MCP context.
 
 ```python
 from typing import Annotated
-from sqlmodel_nexus.use_case import FromContext
+from nexusx.use_case import FromContext
 
 class SprintService(UseCaseService):
     @classmethod
@@ -136,7 +136,7 @@ class SprintService(UseCaseService):
 Helper function that builds a SELECT statement for querying DTO fields.
 
 ```python
-from sqlmodel_nexus import build_dto_select
+from nexusx import build_dto_select
 
 stmt = build_dto_select(SprintSummary)
 stmt = build_dto_select(SprintSummary, where=Sprint.id == sprint_id)

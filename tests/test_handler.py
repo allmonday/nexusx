@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from sqlmodel import Field, Relationship, SQLModel
 
-from sqlmodel_nexus import GraphQLHandler, mutation, query
+from nexusx import GraphQLHandler, mutation, query
 
 
 # Define test base class

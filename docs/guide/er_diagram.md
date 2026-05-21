@@ -1,13 +1,13 @@
 # ER Diagram & Non-ORM Relationships
 
-sqlmodel-nexus auto-discovers ORM relationships from SQLModel entities and supports declaring non-ORM relationships. All relationships can be visualized through ER diagrams.
+nexusx auto-discovers ORM relationships from SQLModel entities and supports declaring non-ORM relationships. All relationships can be visualized through ER diagrams.
 
 ## ORM Relationship Auto-Discovery
 
 `ErManager` automatically discovers entity relationships from SQLAlchemy metadata:
 
 ```python
-from sqlmodel_nexus import ErManager
+from nexusx import ErManager
 
 er = ErManager(base=SQLModel, session_factory=async_session)
 ```
@@ -23,7 +23,7 @@ Discovery scope includes:
 For cross-service calls, computed edges, and non-database relationships, use `Relationship` on entities:
 
 ```python
-from sqlmodel_nexus import Relationship
+from nexusx import Relationship
 
 async def tags_loader(task_ids: list[int]) -> list[list[Tag]]:
     """Batch load tags for multiple tasks."""
@@ -75,7 +75,7 @@ class TaskDTO(DefineSubset):
 
 ```python
 from sqlmodel import SQLModel, Field, Relationship, select
-from sqlmodel_nexus import ErManager, DefineSubset
+from nexusx import ErManager, DefineSubset
 
 # Entity definitions
 class User(SQLModel, table=True):

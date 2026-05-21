@@ -6,8 +6,8 @@ from typing import Annotated
 
 from pydantic import BaseModel
 
-from sqlmodel_nexus.context import Collector, ExposeAs, SendTo
-from sqlmodel_nexus.resolver import Resolver
+from nexusx.context import Collector, ExposeAs, SendTo
+from nexusx.resolver import Resolver
 
 # ──────────────────────────────────────────────────────────
 # Test: ExposeAs — ancestor context passing

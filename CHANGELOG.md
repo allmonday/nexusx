@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.0
+rename to nexusx
+
 ## 1.10.1
 
 ### Bug Fix: UseCase MCP 参数类型强转
@@ -7,7 +10,7 @@
 `call_use_case` 通过 `json.loads()` 解析参数，但 JSON 只产出原生类型（str/int/float/bool/list/dict/None）。当 UseCaseService 方法参数声明为 `uuid.UUID`、`datetime.*`、`Decimal` 或 `BaseModel` 时，值类型不匹配会导致运行时 TypeError。新增 Pydantic TypeAdapter 在调用前自动将 JSON 原生值强转为方法声明的参数类型。
 
 **Changes:**
-- `src/sqlmodel_nexus/use_case/server.py`: 新增 `_coerce_value` 和 `_coerce_kwargs`，在 `call_use_case` 中 `json.loads()` 后、方法调用前执行类型强转
+- `src/nexusx/use_case/server.py`: 新增 `_coerce_value` 和 `_coerce_kwargs`，在 `call_use_case` 中 `json.loads()` 后、方法调用前执行类型强转
 - `tests/test_use_case.py`: 新增 `TypeCoercionService` 及 14 个测试用例，覆盖 UUID/datetime/date/time/Decimal/Optional/list/BaseModel/mixed types 场景
 
 ## 1.10.0
@@ -88,7 +91,7 @@
 新增 `create_router()` 函数，从 `UseCaseService` 的 `@query`/`@mutation` 方法自动生成 FastAPI POST 路由，复用 `UseCaseAppConfig` 配置，与 MCP 服务共享同一套业务逻辑。
 
 ```python
-from sqlmodel_nexus import UseCaseAppConfig, create_use_case_router
+from nexusx import UseCaseAppConfig, create_use_case_router
 
 router = create_use_case_router(
     UseCaseAppConfig(
@@ -176,7 +179,7 @@ class UserService(UseCaseService):
         ...
 
 # After (1.5.0)
-from sqlmodel_nexus import query, mutation
+from nexusx import query, mutation
 
 class UserService(UseCaseService):
     @query
@@ -218,7 +221,7 @@ class UserService(UseCaseService):
 
 ```python
 # Before
-from sqlmodel_nexus import RpcServiceConfig, create_rpc_mcp_server
+from nexusx import RpcServiceConfig, create_rpc_mcp_server
 
 mcp = create_rpc_mcp_server(
     services=[
@@ -228,7 +231,7 @@ mcp = create_rpc_mcp_server(
 )
 
 # After
-from sqlmodel_nexus import create_rpc_mcp_server
+from nexusx import create_rpc_mcp_server
 
 mcp = create_rpc_mcp_server(
     services=[TaskService, SprintService],
@@ -324,9 +327,9 @@ Consolidate all demo applications under `demo/` with domain-based sub-packages:
 
 ### New Feature: Voyager Visualization
 
-Migrated fastapi-voyager's interactive visualization into sqlmodel-nexus, decoupled from FastAPI route introspection. Visualizes RPC service structure and ER diagrams from ErManager.
+Migrated fastapi-voyager's interactive visualization into nexusx, decoupled from FastAPI route introspection. Visualizes RPC service structure and ER diagrams from ErManager.
 
-**New package `sqlmodel_nexus.voyager`:**
+**New package `nexusx.voyager`:**
 
 | Export | Purpose |
 |--------|---------|
@@ -363,7 +366,7 @@ Migrated fastapi-voyager's interactive visualization into sqlmodel-nexus, decoup
 
 Business service classes with auto-discovery, SDL introspection, and dual serving via MCP and web frameworks.
 
-**New package `sqlmodel_nexus.rpc`:**
+**New package `nexusx.rpc`:**
 
 | Export | Purpose |
 |--------|---------|
@@ -440,9 +443,9 @@ Business service classes with auto-discovery, SDL introspection, and dual servin
 
 ### New Public API: Core API Mode
 
-sqlmodel-nexus now provides a complete Core API mode alongside GraphQL, enabling DTO-first response assembly for REST endpoints and service layers.
+nexusx now provides a complete Core API mode alongside GraphQL, enabling DTO-first response assembly for REST endpoints and service layers.
 
-**New exports from `sqlmodel_nexus`:**
+**New exports from `nexusx`:**
 
 | Export | Purpose |
 |--------|---------|
@@ -456,7 +459,7 @@ sqlmodel-nexus now provides a complete Core API mode alongside GraphQL, enabling
 
 ```python
 from sqlmodel import SQLModel
-from sqlmodel_nexus import DefineSubset, ErManager, Loader
+from nexusx import DefineSubset, ErManager, Loader
 
 er = ErManager(base=SQLModel, session_factory=async_session)
 Resolver = er.create_resolver()
@@ -490,12 +493,12 @@ The 0.14.0 Core API exports were not yet part of a stable release. If you used t
 
 ```python
 # Before (0.14.0 feature branch)
-from sqlmodel_nexus import LoaderRegistry, Resolver, AutoLoad
+from nexusx import LoaderRegistry, Resolver, AutoLoad
 registry = LoaderRegistry(entities=[User, Task], session_factory=sf)
 result = await Resolver(registry).resolve(dtos)
 
 # After (1.0.0)
-from sqlmodel_nexus import ErManager
+from nexusx import ErManager
 er = ErManager(base=SQLModel, session_factory=sf)
 Resolver = er.create_resolver()
 result = await Resolver().resolve(dtos)

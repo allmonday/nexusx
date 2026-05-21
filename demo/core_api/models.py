@@ -20,8 +20,8 @@ from typing import Optional
 
 from sqlmodel import Field, Relationship, SQLModel, select
 
-from sqlmodel_nexus import Relationship as CustomRelationship
-from sqlmodel_nexus import mutation, query
+from nexusx import Relationship as CustomRelationship
+from nexusx import mutation, query
 
 
 class User(SQLModel, table=True):

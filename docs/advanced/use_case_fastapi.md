@@ -48,7 +48,7 @@ UseCaseService subclass ──┬── MCP server (AI agents)
 
 ```python
 from fastapi import FastAPI
-from sqlmodel_nexus.use_case import UseCaseService, UseCaseAppConfig, create_use_case_mcp_server
+from nexusx.use_case import UseCaseService, UseCaseAppConfig, create_use_case_mcp_server
 
 # Service definition
 class SprintService(UseCaseService):

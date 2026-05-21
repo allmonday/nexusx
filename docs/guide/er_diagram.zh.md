@@ -1,13 +1,13 @@
 # ER 图与非 ORM 关系
 
-sqlmodel-nexus 自动发现 SQLModel 实体的 ORM 关系，同时支持声明非 ORM 关系。所有关系可通过 ER 图可视化。
+nexusx 自动发现 SQLModel 实体的 ORM 关系，同时支持声明非 ORM 关系。所有关系可通过 ER 图可视化。
 
 ## ORM 关系自动发现
 
 `ErManager` 基于 SQLAlchemy 元数据自动发现实体关系：
 
 ```python
-from sqlmodel_nexus import ErManager
+from nexusx import ErManager
 
 er = ErManager(base=SQLModel, session_factory=async_session)
 ```
@@ -23,7 +23,7 @@ er = ErManager(base=SQLModel, session_factory=async_session)
 对于跨服务调用、计算边、非数据库来源的关系，使用 `Relationship` 在实体上声明：
 
 ```python
-from sqlmodel_nexus import Relationship
+from nexusx import Relationship
 
 async def tags_loader(task_ids: list[int]) -> list[list[Tag]]:
     """批量加载多个 task 的 tags。"""
@@ -75,7 +75,7 @@ class TaskDTO(DefineSubset):
 
 ```python
 from sqlmodel import SQLModel, Field, Relationship, select
-from sqlmodel_nexus import ErManager, DefineSubset
+from nexusx import ErManager, DefineSubset
 
 # 实体定义
 class User(SQLModel, table=True):

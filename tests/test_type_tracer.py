@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from sqlmodel_nexus.mcp.builders.type_tracer import TypeTracer
+from nexusx.mcp.builders.type_tracer import TypeTracer
 
 
 class TestTypeTracer:

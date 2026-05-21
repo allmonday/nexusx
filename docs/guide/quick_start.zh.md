@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-pip install sqlmodel-nexus
+pip install nexusx
 ```
 
 ## 1. 定义 SQLModel 实体
@@ -29,7 +29,7 @@ class Post(SQLModel, table=True):
 ## 2. 添加 @query 和 @mutation
 
 ```python
-from sqlmodel_nexus import query, mutation
+from nexusx import query, mutation
 
 class Post(SQLModel, table=True):
     # ... 字段同上 ...
@@ -57,7 +57,7 @@ class Post(SQLModel, table=True):
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from sqlmodel_nexus import GraphQLHandler
+from nexusx import GraphQLHandler
 
 handler = GraphQLHandler(base=SQLModel, session_factory=async_session)
 

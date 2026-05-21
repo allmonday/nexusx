@@ -7,7 +7,7 @@ import asyncio
 import pytest
 from pydantic import BaseModel
 
-from sqlmodel_nexus.resolver import Resolver
+from nexusx.resolver import Resolver
 
 # ──────────────────────────────────────────────────────────
 # Test: basic resolve_* with custom loaders

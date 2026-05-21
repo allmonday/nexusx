@@ -9,11 +9,11 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
-from sqlmodel_nexus.decorator import mutation, query
-from sqlmodel_nexus.use_case.business import UseCaseService
-from sqlmodel_nexus.use_case.context import FromContext
-from sqlmodel_nexus.use_case.router import create_router
-from sqlmodel_nexus.use_case.types import UseCaseAppConfig
+from nexusx.decorator import mutation, query
+from nexusx.use_case.business import UseCaseService
+from nexusx.use_case.context import FromContext
+from nexusx.use_case.router import create_router
+from nexusx.use_case.types import UseCaseAppConfig
 
 # ──────────────────────────────────────────────────
 # Test DTOs

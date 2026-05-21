@@ -2,11 +2,11 @@
 template: home.html
 ---
 
-# sqlmodel-nexus
+# nexusx
 
-**sqlmodel-nexus** 是一个渐进式 SQLModel 扩展库。从 ORM 实体出发，扩展非 ORM 关系，自动生成 GraphQL API，并用 `DefineSubset` 声明式构建响应 DTO。通过 ER 图可视化实体关系和数据流。
+**nexusx** 是一个渐进式 SQLModel 扩展库。从 ORM 实体出发，扩展非 ORM 关系，自动生成 GraphQL API，并用 `DefineSubset` 声明式构建响应 DTO。通过 ER 图可视化实体关系和数据流。
 
-## sqlmodel-nexus 能解决什么
+## nexusx 能解决什么
 
 | 需求 | 你写什么 | 框架负责什么 |
 |------|----------|--------------|

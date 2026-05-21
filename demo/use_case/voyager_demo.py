@@ -28,8 +28,8 @@ from demo.core_api.models import (
     User,
 )
 from demo.use_case.mcp_server import SprintService, TaskService, UserService
-from sqlmodel_nexus import ErManager
-from sqlmodel_nexus.voyager import create_use_case_voyager
+from nexusx import ErManager
+from nexusx.voyager import create_use_case_voyager
 
 # ──────────────────────────────────────────────────
 # ErManager

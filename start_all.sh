@@ -1,5 +1,5 @@
 #!/bin/bash
-# Start all demo services for sqlmodel-nexus
+# Start all demo services for nexusx
 # Press Ctrl+C to stop all services
 
 set -e
@@ -85,7 +85,7 @@ wait_for_port() {
 }
 
 echo "=============================================="
-echo -e "${CYAN}sqlmodel-nexus Demo Services${NC}"
+echo -e "${CYAN}nexusx Demo Services${NC}"
 echo "=============================================="
 echo ""
 

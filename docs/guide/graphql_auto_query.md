@@ -5,7 +5,7 @@ Skip the `@query` decorator — the framework auto-generates `by_id` and `by_fil
 ## AutoQueryConfig
 
 ```python
-from sqlmodel_nexus import GraphQLHandler, AutoQueryConfig
+from nexusx import GraphQLHandler, AutoQueryConfig
 
 handler = GraphQLHandler(
     base=SQLModel,
@@ -17,7 +17,7 @@ handler = GraphQLHandler(
 You can also register manually:
 
 ```python
-from sqlmodel_nexus import add_standard_queries
+from nexusx import add_standard_queries
 
 add_standard_queries(handler, AutoQueryConfig(session_factory=async_session))
 ```

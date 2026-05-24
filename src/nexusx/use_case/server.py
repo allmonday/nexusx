@@ -214,6 +214,95 @@ def create_use_case_mcp_server(
         except Exception as e:
             return create_error_response(str(e), MCPErrors.INTERNAL_ERROR)
 
+    # Layer 2.5: Sample params generation
+    @mcp.tool()
+    def generate_sample_params(
+        app_name: str, service_name: str, method_name: str
+    ) -> dict[str, Any]:
+        """Generate sample parameters for a use case method.
+
+        Returns example parameter values that LLM can use as a reference
+        before calling call_use_case. This helps avoid JSON format errors
+        when crafting the params argument.
+
+        Use this after describe_service and before call_use_case to see
+        the exact parameter format expected by the method.
+
+        Args:
+            app_name: Name of the application (from list_apps).
+            service_name: Name of the service (from list_services).
+            method_name: Name of the method (from describe_service).
+
+        Returns:
+            Dictionary with sample params, method metadata, and hint.
+        """
+        try:
+            app = manager.get_app(app_name)
+        except ValueError:
+            return create_error_response(
+                f"App '{app_name}' not found. Use list_apps() to see available apps.",
+                MCPErrors.APP_NOT_FOUND,
+            )
+
+        service_cls = app.services.get(service_name)
+        if service_cls is None:
+            available = list(app.services.keys())
+            return create_error_response(
+                f"Service '{service_name}' not found. Available: {available}",
+                MCPErrors.TYPE_NOT_FOUND,
+            )
+
+        methods = getattr(service_cls, USE_CASE_METHODS_ATTR)
+        if method_name not in methods:
+            available = list(methods.keys())
+            return create_error_response(
+                f"Method '{method_name}' not found. Available: {available}",
+                MCPErrors.TYPE_NOT_FOUND,
+            )
+
+        # Get method info from introspector
+        info = app.introspector.describe_service(service_name)
+        if info is None:
+            return create_error_response(
+                f"Service '{service_name}' not found.",
+                MCPErrors.TYPE_NOT_FOUND,
+            )
+
+        # Find matching method
+        method_info = None
+        for m in info.get("methods", []):
+            if m["name"] == method_name:
+                method_info = m
+                break
+
+        if method_info is None:
+            return create_error_response(
+                f"Method '{method_name}' not found in describe_service result.",
+                MCPErrors.TYPE_NOT_FOUND,
+            )
+
+        # Generate sample params based on parameter schema
+        params_schema = method_info.get("parameters", {})
+        sample: dict[str, Any] = {}
+        for param_name, schema in params_schema.items():
+            sample[param_name] = _generate_sample_value(schema.get("type", "string"))
+
+        # Get SDL signature for reference
+        signature_sdl = method_info.get("signature_sdl", "")
+
+        result = create_success_response({
+            "method": method_name,
+            "signature": signature_sdl,
+            "sample_params": json.dumps(sample, ensure_ascii=False),
+            "params_schema": params_schema,
+        })
+        result["hint"] = (
+            f"Sample params for {service_name}.{method_name}: "
+            f"call_use_case(app_name='{app_name}', service_name='{service_name}', "
+            f"method_name='{method_name}', params='{json.dumps(sample, ensure_ascii=False)}')"
+        )
+        return result
+
     # Layer 3: Execute use case
     @mcp.tool()
     async def call_use_case(
@@ -375,6 +464,19 @@ def create_use_case_mcp_server(
         return from_context_params
 
     return mcp
+
+
+def _generate_sample_value(type_name: str) -> Any:
+    """Generate a sample value for a given JSON Schema type name."""
+    _SAMPLES: dict[str, Any] = {
+        "string": "example_value",
+        "integer": 1,
+        "number": 1.0,
+        "boolean": True,
+        "object": {},
+        "array": [],
+    }
+    return _SAMPLES.get(type_name, "example_value")
 
 
 def _coerce_value(value: Any, annotation: Any) -> Any:

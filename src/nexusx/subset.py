@@ -156,8 +156,6 @@ def _extract_field_infos(
         new_field = copy.deepcopy(field)
 
         if is_fk:
-            # Hide FK from serialization output but keep it available for resolve
-            new_field.exclude = True
             # Remove FK metadata to prevent Pydantic-SQLModel interference
             new_field.metadata = [
                 m for m in new_field.metadata
@@ -475,22 +473,19 @@ class SubsetMeta(type):
         subset_fields = list(subset_fields)
 
         # Auto-include PK fields for DataLoader key resolution (ONETOMANY loading).
-        # Tracks PKs added against user's explicit omission so we can hide them
-        # from serialization output while keeping them available for the resolver.
-        _auto_excluded_pks: set[str] = set()
+        _auto_excluded_fields: set[str] = set()
+        existing_set = set(subset_fields)
+        user_omit: set[str] = set()
+        if isinstance(subset_info, SubsetConfig) and subset_info.omit_fields:
+            user_omit = set(subset_info.omit_fields)
+
         pk_fields = _get_pk_field_names(entity_kls)
-        if pk_fields:
-            # Detect which PKs the user explicitly excluded
-            user_omit: set[str] = set()
-            if isinstance(subset_info, SubsetConfig) and subset_info.omit_fields:
-                user_omit = set(subset_info.omit_fields)
-            existing_set = set(subset_fields)
-            for pk in pk_fields:
-                if pk not in existing_set:
-                    subset_fields.append(pk)
-                    existing_set.add(pk)
-                    if pk in user_omit:
-                        _auto_excluded_pks.add(pk)
+        for pk in pk_fields:
+            if pk not in existing_set:
+                subset_fields.append(pk)
+                existing_set.add(pk)
+                if pk in user_omit:
+                    _auto_excluded_fields.add(pk)
 
         # Extract fields from entity
         field_infos = _extract_field_infos(entity_kls, subset_fields)
@@ -508,14 +503,15 @@ class SubsetMeta(type):
         field_definitions.update(field_infos)
         field_definitions.update(extra_fields)
 
-        # Hide auto-included PKs that the user explicitly omitted from serialization
-        for pk in _auto_excluded_pks:
-            if pk in field_definitions:
-                _anno, fi = field_definitions[pk]
+        # Hide auto-included PK fields from serialization when user explicitly
+        # omitted them via omit_fields. They remain available internally for DataLoader.
+        for field_name in _auto_excluded_fields:
+            if field_name in field_definitions:
+                _anno, fi = field_definitions[field_name]
                 if isinstance(fi, FieldInfo):
                     new_fi = copy.deepcopy(fi)
                     new_fi.exclude = True
-                    field_definitions[pk] = (_anno, new_fi)
+                    field_definitions[field_name] = (_anno, new_fi)
 
         # Apply SubsetConfig modifiers (excluded_fields, expose_as, send_to)
         # Applied after merge so it can reference both subset and extra fields

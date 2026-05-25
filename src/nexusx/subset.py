@@ -84,6 +84,15 @@ def _get_all_relationship_names(entity: type[SQLModel]) -> set[str]:
     return orm_names | custom_names
 
 
+def _get_pk_field_names(entity: type[SQLModel]) -> list[str]:
+    """Get primary key field names from a SQLModel entity."""
+    pk_names: list[str] = []
+    for field_name, field_info in entity.model_fields.items():
+        if getattr(field_info, "primary_key", None) is True:
+            pk_names.append(field_name)
+    return pk_names
+
+
 def _get_sqlmodel_scalar_fields(entity: type[SQLModel]) -> dict[str, FieldInfo]:
     """Get only scalar fields from a SQLModel entity (exclude relationships and FK fields)."""
     relationship_names = _get_relationship_names(entity)
@@ -147,8 +156,6 @@ def _extract_field_infos(
         new_field = copy.deepcopy(field)
 
         if is_fk:
-            # Hide FK from serialization output but keep it available for resolve
-            new_field.exclude = True
             # Remove FK metadata to prevent Pydantic-SQLModel interference
             new_field.metadata = [
                 m for m in new_field.metadata
@@ -462,6 +469,24 @@ class SubsetMeta(type):
 
         _validate_subset_fields(subset_fields)
 
+        # Ensure subset_fields is mutable (tuple syntax yields a tuple)
+        subset_fields = list(subset_fields)
+
+        # Auto-include PK fields for DataLoader key resolution (ONETOMANY loading).
+        _auto_excluded_fields: set[str] = set()
+        existing_set = set(subset_fields)
+        user_omit: set[str] = set()
+        if isinstance(subset_info, SubsetConfig) and subset_info.omit_fields:
+            user_omit = set(subset_info.omit_fields)
+
+        pk_fields = _get_pk_field_names(entity_kls)
+        for pk in pk_fields:
+            if pk not in existing_set:
+                subset_fields.append(pk)
+                existing_set.add(pk)
+                if pk in user_omit:
+                    _auto_excluded_fields.add(pk)
+
         # Extract fields from entity
         field_infos = _extract_field_infos(entity_kls, subset_fields)
 
@@ -477,6 +502,16 @@ class SubsetMeta(type):
         field_definitions: dict[str, tuple[Any, Any]] = {}
         field_definitions.update(field_infos)
         field_definitions.update(extra_fields)
+
+        # Hide auto-included PK fields from serialization when user explicitly
+        # omitted them via omit_fields. They remain available internally for DataLoader.
+        for field_name in _auto_excluded_fields:
+            if field_name in field_definitions:
+                _anno, fi = field_definitions[field_name]
+                if isinstance(fi, FieldInfo):
+                    new_fi = copy.deepcopy(fi)
+                    new_fi.exclude = True
+                    field_definitions[field_name] = (_anno, new_fi)
 
         # Apply SubsetConfig modifiers (excluded_fields, expose_as, send_to)
         # Applied after merge so it can reference both subset and extra fields

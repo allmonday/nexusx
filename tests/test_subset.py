@@ -99,18 +99,18 @@ class TestDefineSubsetBasic:
 # ──────────────────────────────────────────────────────────
 
 class TestDefineSubsetFK:
-    def test_fk_field_hidden_from_output(self):
-        """FK fields should have exclude=True, hiding them from serialization."""
+    def test_fk_field_visible_when_explicitly_declared(self):
+        """FK fields explicitly declared in fields should be visible in serialization."""
 
         class PostSummary(DefineSubset):
             __subset__ = (SamplePost, ("id", "title", "author_id"))
 
         assert "author_id" in PostSummary.model_fields
-        # FK field should be excluded from serialization
-        assert PostSummary.model_fields["author_id"].exclude is True
+        # Explicitly declared FK should NOT be excluded
+        assert PostSummary.model_fields["author_id"].exclude is not True
 
-    def test_fk_field_available_internally(self):
-        """FK fields should still be accessible in code even if excluded from output."""
+    def test_fk_field_available_and_visible(self):
+        """FK fields explicitly declared should be accessible and appear in serialization."""
 
         class PostSummary(DefineSubset):
             __subset__ = (SamplePost, ("id", "title", "author_id"))
@@ -120,16 +120,20 @@ class TestDefineSubsetFK:
 
         # Internal access works
         assert dto.author_id == 42
-        # But serialization excludes it
+        # Explicitly declared FK is also visible in serialization
         data = dto.model_dump()
-        assert "author_id" not in data
+        assert "author_id" in data
+        assert data["author_id"] == 42
 
-    def test_fk_without_select(self):
-        """If FK is not in field list, it should not appear in DTO."""
+    def test_fk_not_auto_included_when_not_in_fields(self):
+        """FK fields NOT in fields list are NOT auto-included.
+        Users who need DataLoader key resolution must declare FK fields explicitly.
+        """
 
         class PostSummary(DefineSubset):
             __subset__ = (SamplePost, ("id", "title"))
 
+        # FK is NOT auto-included
         assert "author_id" not in PostSummary.model_fields
 
 

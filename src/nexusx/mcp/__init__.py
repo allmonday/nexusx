@@ -44,7 +44,7 @@ from __future__ import annotations
 
 __all__ = [
     "create_mcp_server",
-    "config_simple_mcp_server",
+    "create_simple_mcp_server",
     "AppConfig",
     "MultiAppManager",
     "SingleAppManager",
@@ -52,5 +52,5 @@ __all__ = [
 ]
 
 from nexusx.mcp.managers import AppResources, MultiAppManager, SingleAppManager
-from nexusx.mcp.server import config_simple_mcp_server, create_mcp_server
+from nexusx.mcp.server import create_mcp_server, create_simple_mcp_server
 from nexusx.mcp.types.app_config import AppConfig

@@ -118,7 +118,7 @@ def create_mcp_server(
     return mcp
 
 
-def config_simple_mcp_server(
+def create_simple_mcp_server(
     base: type,
     name: str = "nexusx API",
     desc: str | None = None,
@@ -158,7 +158,7 @@ def config_simple_mcp_server(
         ```python
         from sqlmodel import SQLModel
         from nexusx import query
-        from nexusx.mcp import config_simple_mcp_server
+        from nexusx.mcp import create_simple_mcp_server
 
         class BaseEntity(SQLModel):
             pass
@@ -172,7 +172,7 @@ def config_simple_mcp_server(
                 return await fetch_users()
 
         # Create simplified MCP server
-        mcp = config_simple_mcp_server(
+        mcp = create_simple_mcp_server(
             base=BaseEntity,
             name="My Blog API",
             desc="Blog system with users and posts"
@@ -211,3 +211,4 @@ def config_simple_mcp_server(
     register_simple_tools(mcp, manager, allow_mutation=allow_mutation)
 
     return mcp
+

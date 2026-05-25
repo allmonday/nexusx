@@ -13,9 +13,9 @@ pip install nexusx[fastmcp]
 最简模式——传入 SQLModel 基类即可：
 
 ```python
-from nexusx.mcp import config_simple_mcp_server
+from nexusx.mcp import create_simple_mcp_server
 
-mcp = config_simple_mcp_server(
+mcp = create_simple_mcp_server(
     base=SQLModel,
     name="My API",
 )
@@ -61,7 +61,7 @@ mcp.run()
 MCP 服务需要 `session_factory` 来执行数据库查询：
 
 ```python
-mcp = config_simple_mcp_server(
+mcp = create_simple_mcp_server(
     base=SQLModel,
     name="My API",
     session_factory=async_session,

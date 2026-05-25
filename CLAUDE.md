@@ -107,7 +107,7 @@ from nexusx import (
 
 # MCP (GraphQL)
 from nexusx.mcp import (
-    config_simple_mcp_server, # 单应用 MCP 服务
+    create_simple_mcp_server, # 单应用 MCP 服务
     create_mcp_server,        # 多应用 MCP 服务
     AppConfig,                # 应用配置
 )
@@ -116,6 +116,7 @@ from nexusx.mcp import (
 ## 开发命令
 
 ```bash
+./scripts/check-ci.sh                                       # 本地执行与 CI 一致的检查
 uv run pytest                                              # 运行测试
 uv run ruff check src/ tests/                              # Lint 检查
 uv run ruff check --fix src/ tests/                        # Lint 修复

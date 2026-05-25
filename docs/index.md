@@ -15,7 +15,7 @@ template: home.html
 | Derived fields | `post_*` methods | Auto-execute after nested data is ready |
 | Cross-layer data flow | `ExposeAs`, `SendTo`, `Collector` | Pass context downward or aggregate results upward |
 | Non-ORM relationships | `Relationship(...)` | Same DataLoader infrastructure, supports auto-loading |
-| AI-ready API | `config_simple_mcp_server(base=...)` | Progressive MCP tool exposure |
+| AI-ready API | `create_simple_mcp_server(base=...)` | Progressive MCP tool exposure |
 
 ## Use Cases
 

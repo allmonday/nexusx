@@ -2,14 +2,14 @@
 
 Complete API reference for MCP service configuration.
 
-## config_simple_mcp_server
+## create_simple_mcp_server
 
 Create a single-app MCP service.
 
 ```python
-from nexusx.mcp import config_simple_mcp_server
+from nexusx.mcp import create_simple_mcp_server
 
-mcp = config_simple_mcp_server(
+mcp = create_simple_mcp_server(
     base=SQLModel,              # SQLModel base class
     name="My API",              # Service name
     session_factory=async_session,  # Session factory

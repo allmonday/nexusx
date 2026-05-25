@@ -8,7 +8,8 @@ import pytest
 from sqlmodel import Field, SQLModel
 
 from nexusx import mutation, query
-from nexusx.mcp import config_simple_mcp_server
+from nexusx.mcp import create_simple_mcp_server
+from nexusx.mcp.server import config_simple_mcp_server
 from nexusx.mcp.managers.single_app_manager import SingleAppManager
 
 
@@ -104,7 +105,7 @@ class TestGetSchema:
 
     def test_get_schema_returns_sdl(self) -> None:
         """Test get_schema returns SDL format."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
         get_schema_tool = tools.get("get_schema")
 
@@ -116,7 +117,7 @@ class TestGetSchema:
 
     def test_get_schema_includes_mutations(self) -> None:
         """Test get_schema includes mutations when allow_mutation=True."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
         get_schema_tool = tools.get("get_schema")
 
@@ -127,7 +128,7 @@ class TestGetSchema:
 
     def test_get_schema_excludes_mutations_by_default(self) -> None:
         """Test get_schema excludes mutations when allow_mutation=False (default)."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
         get_schema_tool = tools.get("get_schema")
 
@@ -144,7 +145,7 @@ class TestGraphQLQuery:
     @pytest.mark.asyncio
     async def test_graphql_query_with_valid_query(self) -> None:
         """Test graphql_query with valid query."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
         graphql_query_tool = tools.get("graphql_query")
 
@@ -158,7 +159,7 @@ class TestGraphQLQuery:
     @pytest.mark.asyncio
     async def test_graphql_query_with_invalid_syntax(self) -> None:
         """Test graphql_query with invalid syntax."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
         graphql_query_tool = tools.get("graphql_query")
 
@@ -171,7 +172,7 @@ class TestGraphQLQuery:
     @pytest.mark.asyncio
     async def test_graphql_query_with_empty_query(self) -> None:
         """Test graphql_query with empty query."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
         graphql_query_tool = tools.get("graphql_query")
 
@@ -183,7 +184,7 @@ class TestGraphQLQuery:
     @pytest.mark.asyncio
     async def test_graphql_query_with_none_query(self) -> None:
         """Test graphql_query with None query."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
         graphql_query_tool = tools.get("graphql_query")
 
@@ -195,7 +196,7 @@ class TestGraphQLQuery:
     @pytest.mark.asyncio
     async def test_graphql_query_with_get_by_id(self) -> None:
         """Test graphql_query with get by ID."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
         graphql_query_tool = tools.get("graphql_query")
 
@@ -213,7 +214,7 @@ class TestGraphQLMutation:
     @pytest.mark.asyncio
     async def test_graphql_mutation_create(self) -> None:
         """Test graphql_mutation with create mutation."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
         graphql_mutation_tool = tools.get("graphql_mutation")
 
@@ -231,7 +232,7 @@ class TestGraphQLMutation:
     @pytest.mark.asyncio
     async def test_graphql_mutation_with_invalid_syntax(self) -> None:
         """Test graphql_mutation with invalid syntax."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
         graphql_mutation_tool = tools.get("graphql_mutation")
 
@@ -243,7 +244,7 @@ class TestGraphQLMutation:
     @pytest.mark.asyncio
     async def test_graphql_mutation_with_empty_mutation(self) -> None:
         """Test graphql_mutation with empty mutation."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
         graphql_mutation_tool = tools.get("graphql_mutation")
 
@@ -255,7 +256,7 @@ class TestGraphQLMutation:
     @pytest.mark.asyncio
     async def test_graphql_mutation_with_none_mutation(self) -> None:
         """Test graphql_mutation with None mutation."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
         graphql_mutation_tool = tools.get("graphql_mutation")
 
@@ -266,18 +267,18 @@ class TestGraphQLMutation:
 
     def test_mutation_tool_not_registered_by_default(self) -> None:
         """Test graphql_mutation is not registered when allow_mutation=False."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
 
         assert "graphql_mutation" not in tools
 
 
 class TestConfigSimpleMCPServer:
-    """Test cases for config_simple_mcp_server function."""
+    """Test cases for create_simple_mcp_server function."""
 
     def test_config_simple_mcp_server_creation(self) -> None:
         """Test creating simple MCP server."""
-        mcp = config_simple_mcp_server(
+        mcp = create_simple_mcp_server(
             base=SimpleMCPMockBaseEntity, name="Test API", desc="Test Description"
         )
 
@@ -286,13 +287,13 @@ class TestConfigSimpleMCPServer:
 
     def test_config_simple_mcp_server_with_defaults(self) -> None:
         """Test creating simple MCP server with defaults."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
 
         assert mcp.name == "nexusx API"
 
     def test_config_simple_mcp_server_tools_registered(self) -> None:
         """Test that only 2 tools are registered by default (allow_mutation=False)."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
 
         # Should only have 2 tools by default
@@ -312,7 +313,7 @@ class TestConfigSimpleMCPServer:
 
     def test_config_simple_mcp_server_tools_with_mutation(self) -> None:
         """Test that 3 tools are registered when allow_mutation=True."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
 
         # Should have 3 tools
@@ -323,7 +324,7 @@ class TestConfigSimpleMCPServer:
 
     def test_config_simple_mcp_server_no_app_name_parameter(self) -> None:
         """Test that tools do not require app_name parameter."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
 
         # Check graphql_query tool signature
@@ -349,7 +350,7 @@ class TestSimpleMCPIntegration:
     @pytest.mark.asyncio
     async def test_full_workflow(self) -> None:
         """Test full workflow: get schema -> query -> mutation."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity, allow_mutation=True)
         tools = _get_tools_dict(mcp)
 
         # Step 1: Get schema
@@ -385,7 +386,7 @@ class TestSimpleMCPIntegration:
     @pytest.mark.asyncio
     async def test_read_only_workflow(self) -> None:
         """Test read-only workflow: get schema -> query (no mutations)."""
-        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+        mcp = create_simple_mcp_server(base=SimpleMCPMockBaseEntity)
         tools = _get_tools_dict(mcp)
 
         # Step 1: Get schema - should not include mutations
@@ -407,3 +408,12 @@ class TestSimpleMCPIntegration:
 
         # Step 3: Mutation tool should not be available
         assert "graphql_mutation" not in tools
+
+
+class TestSimpleMCPServerBackwardCompatibility:
+    """Backward compatibility coverage for deprecated alias."""
+
+    def test_config_simple_mcp_server_alias_still_works(self) -> None:
+        mcp = config_simple_mcp_server(base=SimpleMCPMockBaseEntity)
+
+        assert mcp.name == "nexusx API"

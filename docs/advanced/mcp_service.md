@@ -13,9 +13,9 @@ pip install nexusx[fastmcp]
 The simplest mode — pass a SQLModel base class:
 
 ```python
-from nexusx.mcp import config_simple_mcp_server
+from nexusx.mcp import create_simple_mcp_server
 
-mcp = config_simple_mcp_server(
+mcp = create_simple_mcp_server(
     base=SQLModel,
     name="My API",
 )
@@ -61,7 +61,7 @@ Multi-app tools:
 MCP services need a `session_factory` to execute database queries:
 
 ```python
-mcp = config_simple_mcp_server(
+mcp = create_simple_mcp_server(
     base=SQLModel,
     name="My API",
     session_factory=async_session,

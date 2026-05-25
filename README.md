@@ -131,7 +131,7 @@ The concepts appear in this order because they mirror the delivery path from ide
 | Derived fields | `post_*` methods | Runs after all nested data is resolved |
 | Cross-layer data flow | `ExposeAs`, `SendTo`, `Collector` | Pass context down or aggregate values up |
 | Non-ORM relationships | `Relationship(...)` on entity | Same DataLoader infra, same auto-loading |
-| AI-ready APIs | `config_simple_mcp_server(base=...)` | Progressive-disclosure MCP tools |
+| AI-ready APIs | `create_simple_mcp_server(base=...)` | Progressive-disclosure MCP tools |
 | Business services | `UseCaseService` subclass with `@query`/`@mutation` methods | Auto-discovery, SDL introspection, MCP + FastAPI dual serving |
 | DTO query building | `build_dto_select(DtoClass, where=...)` | Builds SQL SELECT from DefineSubset DTO fields |
 | Auto REST routes | `create_use_case_router(config)` | Generates POST routes from UseCaseService methods |
@@ -455,9 +455,9 @@ Expose your SQLModel APIs to AI assistants with one function call.
 ### Simple MCP Server
 
 ```python
-from nexusx.mcp import config_simple_mcp_server
+from nexusx.mcp import create_simple_mcp_server
 
-mcp = config_simple_mcp_server(base=SQLModel, name="My API")
+mcp = create_simple_mcp_server(base=SQLModel, name="My API")
 mcp.run()  # stdio mode
 ```
 

@@ -178,6 +178,18 @@ def _build_class_meta(kls: type) -> _ClassMeta:
 # change at runtime. Shared across all Resolver instances.
 _class_meta_cache: dict[type, _ClassMeta] = {}
 
+# Auto-load plan cache: (DTO class, registry id) → list of (field_name, rel_name, rel_info, field_info)
+_auto_load_cache: dict[tuple[type, int], list] = {}
+
+# Type extraction cache: annotation → DTO class or None
+_dto_cls_cache: dict[Any, type[BaseModel] | None] = {}
+
+
+def _clear_resolver_caches() -> None:
+    """Clear all resolver-level caches. For testing only."""
+    _auto_load_cache.clear()
+    _dto_cls_cache.clear()
+
 
 def _get_class_meta(kls: type) -> _ClassMeta:
     """Get or compute class metadata (cached globally)."""
@@ -322,11 +334,17 @@ class Resolver:
         if not isinstance(node, BaseModel) or self._registry is None:
             return []
 
+        cache_key = (type(node), id(self._registry))
+        cached = _auto_load_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         from nexusx.subset import get_subset_source
         from nexusx.utils.type_compat import is_compatible_type
 
         source_entity = get_subset_source(type(node))
         if source_entity is None:
+            _auto_load_cache[cache_key] = []
             return []
 
         # Get relationship names from source entity
@@ -359,14 +377,30 @@ class Resolver:
             if is_compatible_type(dto_cls, rel_info.target_entity):
                 results.append((field_name, field_name, rel_info, field_info))
 
+        _auto_load_cache[cache_key] = results
         return results
 
     def _extract_dto_cls(self, field_info: Any) -> type[BaseModel] | None:
         """Extract the DTO class from a field annotation.
 
         Handles Optional, list, Annotated wrappers.
+        Results are cached by annotation object for repeated lookups.
         """
         anno = field_info.annotation
+        cached = _dto_cls_cache.get(anno)
+        if cached is not None:
+            return cached
+        if anno in _dto_cls_cache:
+            # Explicit None was cached (different from cache miss)
+            return None
+
+        result = self._do_extract_dto_cls(anno)
+        _dto_cls_cache[anno] = result
+        return result
+
+    @staticmethod
+    def _do_extract_dto_cls(anno: Any) -> type[BaseModel] | None:
+        """Actual type extraction logic (uncached)."""
         # Resolve string annotations from __future__ import annotations
         if isinstance(anno, str):
             return None

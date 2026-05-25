@@ -62,7 +62,7 @@ class MultiAppManager:
         )
 
         # Create type tracer for progressive disclosure
-        introspection_data = handler._introspection_generator.generate()
+        introspection_data = handler.get_introspection_data()
         entity_names = {e.__name__ for e in handler.entities}
         tracer = TypeTracer(introspection_data, entity_names)
 
@@ -72,7 +72,7 @@ class MultiAppManager:
             description=config.get("description", ""),
             handler=handler,
             tracer=tracer,
-            sdl_generator=handler._sdl_generator,
+            sdl_generator=handler.get_sdl_generator(),
         )
 
     def get_app(self, name: str) -> AppResources:

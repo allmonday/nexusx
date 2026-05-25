@@ -124,6 +124,14 @@ class GraphQLHandler:
             loader_registry=self._er_manager,
         )
 
+    def get_sdl_generator(self) -> SDLGenerator:
+        """Get the public SDL generator used by this handler."""
+        return self._sdl_generator
+
+    def get_introspection_data(self) -> dict[str, Any]:
+        """Get GraphQL introspection data for the current schema."""
+        return self._introspection_generator.generate()
+
     def get_graphiql_html(self, endpoint: str = "/graphql") -> str:
         """Get the GraphiQL HTML template.
 

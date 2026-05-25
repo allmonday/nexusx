@@ -86,8 +86,9 @@ class TestSingleAppManager:
 
         assert manager.handler is not None
         # Description is passed to SDLGenerator
-        assert manager.handler._sdl_generator._query_description == "Test API"
-        assert manager.handler._sdl_generator._mutation_description == "Test API"
+        sdl_generator = manager.handler.get_sdl_generator()
+        assert sdl_generator._query_description == "Test API"
+        assert sdl_generator._mutation_description == "Test API"
 
     def test_entity_names_property(self) -> None:
         """Test entity_names property."""

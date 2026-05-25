@@ -65,12 +65,12 @@ class SingleAppManager:
         )
 
         # Create type tracer for schema introspection
-        introspection_data = self.handler._introspection_generator.generate()
+        introspection_data = self.handler.get_introspection_data()
         entity_names = {e.__name__ for e in self.handler.entities}
         self.tracer = TypeTracer(introspection_data, entity_names)
 
         # Reference to SDL generator
-        self.sdl_generator = self.handler._sdl_generator
+        self.sdl_generator = self.handler.get_sdl_generator()
 
     @property
     def entity_names(self) -> set[str]:

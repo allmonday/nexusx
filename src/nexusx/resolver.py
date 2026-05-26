@@ -775,20 +775,18 @@ class Resolver:
     # BFS traversal
     # ──────────────────────────────────────────────────────
 
-    _EMPTY_DICT: dict[str, Any] = {}  # Shared empty dict for _WorkItem
-
     async def _bfs_resolve(self, node: T) -> T:
         """BFS resolve: level-by-level traversal with batched DataLoader calls."""
         if isinstance(node, (list, tuple)):
             items = [
-                _WorkItem(n, parent=None, ancestor_context=self._EMPTY_DICT,
-                          collector_snapshot=self._EMPTY_DICT)
+                _WorkItem(n, parent=None, ancestor_context={},
+                          collector_snapshot={})
                 for n in node
                 if isinstance(n, BaseModel)
             ]
         elif isinstance(node, BaseModel):
-            items = [_WorkItem(node, parent=None, ancestor_context=self._EMPTY_DICT,
-                               collector_snapshot=self._EMPTY_DICT)]
+            items = [_WorkItem(node, parent=None, ancestor_context={},
+                               collector_snapshot={})]
         else:
             return node
         await self._process_level(items)

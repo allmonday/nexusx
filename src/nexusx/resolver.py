@@ -842,27 +842,54 @@ class Resolver:
 
             level_state.append((item, meta, new_ancestor_ctx, merged_collectors))
 
-        # ── Phase 1: Resolve + Auto-load (batched) ──
-        resolve_tasks: list[Any] = []
+        # ── Phase 1: Execute resolve_* methods in parallel (collect results, don't traverse) ──
+        resolve_jobs: list[tuple[Any, str, Any, dict[str, Any], dict[str, ICollector]]] = []
+        resolve_coros: list[Any] = []
 
         for item, meta, new_ancestor_ctx, merged_collectors in level_state:
             node = item.node
             for field_name, attr_name in meta.resolve_methods:
                 method = getattr(node, attr_name)
                 param_info = meta.resolve_params[attr_name]
-                resolve_tasks.append(
-                    self._bfs_resolve_and_set(
-                        node, field_name, method, param_info,
+                resolve_coros.append(
+                    self._execute_resolve_method(
+                        node, method, param_info,
                         parent=item.parent, ancestor_context=item.ancestor_context,
-                        child_ancestor_ctx=new_ancestor_ctx,
-                        child_collectors=merged_collectors,
                     )
                 )
+                resolve_jobs.append((node, field_name, new_ancestor_ctx, merged_collectors))
+
+        # Run all resolve_* methods concurrently so DataLoader can batch loads
+        resolve_outputs = await asyncio.gather(*resolve_coros) if resolve_coros else []
+
+        # Collect results and extract children for merged traversal
+        resolve_results: list[tuple[Any, str, Any]] = []
+        resolve_children: list[_WorkItem] = []
+
+        for (node, field_name, new_ancestor_ctx, merged_collectors), result in zip(
+            resolve_jobs, resolve_outputs, strict=True,
+        ):
+            resolve_results.append((node, field_name, result))
+
+            if isinstance(result, (list, tuple)):
+                for r in result:
+                    if isinstance(r, BaseModel):
+                        resolve_children.append(_WorkItem(
+                            node=r, parent=node,
+                            ancestor_context=new_ancestor_ctx,
+                            collector_snapshot=merged_collectors,
+                        ))
+            elif isinstance(result, BaseModel):
+                resolve_children.append(_WorkItem(
+                    node=result, parent=node,
+                    ancestor_context=new_ancestor_ctx,
+                    collector_snapshot=merged_collectors,
+                ))
 
         # Batch auto-load: group by relationship, collect FK values, load_many
         auto_load_children = await self._batch_auto_load(level_state)
 
-        # Collect existing object-field children — only for types that have extra fields
+        # Collect existing object-field children
         existing_children: list[_WorkItem] = []
         for item, _meta, new_ancestor_ctx, merged_collectors in level_state:
             node = item.node
@@ -884,14 +911,14 @@ class Resolver:
                             collector_snapshot=merged_collectors,
                         ))
 
-        # Await all resolve_* tasks
-        if resolve_tasks:
-            await asyncio.gather(*resolve_tasks)
-
-        # ── Phase 2: Process next level ──
-        next_level = auto_load_children + existing_children
+        # ── Phase 2: Merge ALL children and process next level together ──
+        next_level = resolve_children + auto_load_children + existing_children
         if next_level:
             await self._process_level(next_level)
+
+        # Set resolve results back on nodes (after children are fully traversed)
+        for node, field_name, result in resolve_results:
+            setattr(node, field_name, result)
 
         # ── Phase 3: Post_* methods ──
         for item, meta, _new_ancestor_ctx, _merged_collectors in level_state:
@@ -928,39 +955,6 @@ class Resolver:
         for item, meta, _new_ancestor_ctx, _merged_collectors in level_state:
             if meta.collector_aliases:
                 self._node_collectors.pop(id(item.node), None)
-
-    async def _bfs_resolve_and_set(
-        self,
-        node: Any,
-        trim_field: str,
-        method: Callable,
-        param_info: _MethodParamInfo,
-        *,
-        parent: Any,
-        ancestor_context: dict[str, Any],
-        child_ancestor_ctx: dict[str, Any],
-        child_collectors: dict[str, ICollector],
-    ) -> None:
-        """Execute resolve method for BFS mode, traverse result via BFS."""
-        result = await self._execute_resolve_method(
-            node, method, param_info,
-            parent=parent, ancestor_context=ancestor_context,
-        )
-        # Traverse result as a new sub-tree via BFS
-        if isinstance(result, (list, tuple)):
-            children = [
-                _WorkItem(r, parent=node, ancestor_context=child_ancestor_ctx,
-                          collector_snapshot=child_collectors)
-                for r in result if isinstance(r, BaseModel)
-            ]
-            if children:
-                await self._process_level(children)
-        elif isinstance(result, BaseModel):
-            await self._process_level([_WorkItem(
-                result, parent=node, ancestor_context=child_ancestor_ctx,
-                collector_snapshot=child_collectors,
-            )])
-        setattr(node, trim_field, result)
 
     async def _bfs_post_and_set(
         self,

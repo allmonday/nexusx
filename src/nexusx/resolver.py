@@ -194,7 +194,7 @@ def _build_class_meta(kls: type) -> _ClassMeta:
 # change at runtime. Shared across all Resolver instances.
 _class_meta_cache: dict[type, _ClassMeta] = {}
 
-# Auto-load plan cache: (DTO class, registry id) → list of (field_name, rel_name, rel_info, field_info)
+# Auto-load plan cache: (DTO class, registry id) → auto-load specs
 _auto_load_cache: dict[tuple[type, int], list] = {}
 
 # Type extraction cache: annotation → DTO class or None
@@ -803,7 +803,9 @@ class Resolver:
         # ── Phase 0: Prepare — group by type for shared metadata ──
         # Pre-compute: expose_map, collector_aliases, resolve_methods, post_methods, send_to_map
         # are all per-type (same for all instances of the same class).
-        type_meta: dict[type, tuple[_ClassMeta, dict[str, str], dict[str, str | tuple[str, ...]]]] = {}
+        type_meta: dict[
+            type, tuple[_ClassMeta, dict[str, str], dict[str, str | tuple[str, ...]]]
+        ] = {}
 
         # Per-node state: (item, meta, new_ancestor_ctx, merged_collectors)
         level_state: list[tuple[_WorkItem, _ClassMeta, dict[str, Any], dict[str, ICollector]]] = []
@@ -865,10 +867,8 @@ class Resolver:
 
         # Collect existing object-field children — only for types that have extra fields
         existing_children: list[_WorkItem] = []
-        for item, meta, new_ancestor_ctx, merged_collectors in level_state:
+        for item, _meta, new_ancestor_ctx, merged_collectors in level_state:
             node = item.node
-            # Skip if all extra fields are None (common case after auto-load sets them)
-            has_children = False
             for field_name in type(node).model_fields:
                 val = getattr(node, field_name, None)
                 if val is None:
@@ -879,7 +879,6 @@ class Resolver:
                         ancestor_context=new_ancestor_ctx,
                         collector_snapshot=merged_collectors,
                     ))
-                    has_children = True
                 elif isinstance(val, list) and val and isinstance(val[0], BaseModel):
                     for c in val:
                         existing_children.append(_WorkItem(
@@ -887,7 +886,6 @@ class Resolver:
                             ancestor_context=new_ancestor_ctx,
                             collector_snapshot=merged_collectors,
                         ))
-                    has_children = True
 
         # Await all resolve_* tasks
         if resolve_tasks:
@@ -899,7 +897,7 @@ class Resolver:
             await self._process_level(next_level)
 
         # ── Phase 3: Post_* methods ──
-        for item, meta, new_ancestor_ctx, merged_collectors in level_state:
+        for item, meta, _new_ancestor_ctx, _merged_collectors in level_state:
             if not meta.post_methods:
                 continue
             node = item.node
@@ -912,7 +910,7 @@ class Resolver:
                 )
 
         # ── Phase 4: SendTo collection ──
-        for item, meta, new_ancestor_ctx, merged_collectors in level_state:
+        for item, _meta, _new_ancestor_ctx, merged_collectors in level_state:
             node_type = type(item.node)
             _, _, send_to_map = type_meta[node_type]
             if not send_to_map:
@@ -930,7 +928,7 @@ class Resolver:
                         collector.add(value)
 
         # ── Phase 5: Cleanup ──
-        for item, meta, new_ancestor_ctx, merged_collectors in level_state:
+        for item, meta, _new_ancestor_ctx, _merged_collectors in level_state:
             if meta.collector_aliases:
                 self._node_collectors.pop(id(item.node), None)
 
@@ -1003,9 +1001,11 @@ class Resolver:
         )
 
         # Collect auto-load specs per node, group by (node_type, rel_name)
-        groups: dict[tuple[type, str], list[tuple[int, Any, str, Any, Any, type[BaseModel] | None]]] = {}
+        groups: dict[
+            tuple[type, str], list[tuple[int, Any, str, Any, Any, type[BaseModel] | None]]
+        ] = {}
 
-        for idx, (item, meta, new_ancestor_ctx, merged_collectors) in enumerate(level_state):
+        for idx, (item, meta, _new_ancestor_ctx, _merged_collectors) in enumerate(level_state):
             node = item.node
             auto_load_entries = self._scan_auto_load_fields(node, meta)
             if not auto_load_entries:
@@ -1023,7 +1023,7 @@ class Resolver:
         next_items: list[_WorkItem] = []
 
         # Process each relationship group
-        for (node_type, rel_name), entries in groups.items():
+        for (_node_type, rel_name), entries in groups.items():
             # Get loader from first entry's node
             first_node = entries[0][1]
             first_dto = entries[0][5]
@@ -1044,7 +1044,7 @@ class Resolver:
             # Collect all FK/PK values and dispatch batch load
             keys: list[Any] = []
             valid_entries: list[tuple[int, Any, str, type[BaseModel] | None]] = []
-            for idx, node, field_name, rel_info, field_info, dto_cls in entries:
+            for idx, node, field_name, _rel_info, _field_info, dto_cls in entries:
                 key = getattr(node, fk_field, None)
                 if key is not None:
                     keys.append(key)

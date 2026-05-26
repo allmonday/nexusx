@@ -462,3 +462,117 @@ class TestResolverPostAdvanced:
         await Resolver().resolve(Model())
 
         assert execution_order == ["resolve", "post"]
+
+
+# ──────────────────────────────────────────────────────────
+# Test: BFS edge cases — uncovered paths
+# ──────────────────────────────────────────────────────────
+
+
+class TestBfsEdgeCases:
+    async def test_empty_list_input(self):
+        """Resolver should handle an empty list without error."""
+        result = await Resolver().resolve([])
+        assert result == []
+
+    async def test_non_basemodel_input(self):
+        """Non-BaseModel input should be returned as-is."""
+        result = await Resolver().resolve("just a string")
+        assert result == "just a string"
+
+    async def test_tuple_input(self):
+        """Resolver should accept a tuple of BaseModel instances."""
+
+        class Item(BaseModel):
+            name: str
+            label: str = ""
+
+            def resolve_label(self):
+                return f"label:{self.name}"
+
+        items = (Item(name="A"), Item(name="B"))
+        result = await Resolver().resolve(items)
+        assert isinstance(result, tuple)
+        assert result[0].label == "label:A"
+        assert result[1].label == "label:B"
+
+    async def test_mixed_list_filters_non_basemodel(self):
+        """Non-BaseModel items in a list should be silently skipped."""
+
+        class Item(BaseModel):
+            name: str
+            label: str = ""
+
+            def resolve_label(self):
+                return f"label:{self.name}"
+
+        items = [Item(name="A"), "not a model", Item(name="B")]
+        result = await Resolver().resolve(items)
+        assert result[0].label == "label:A"
+        assert result[1] == "not a model"
+        assert result[2].label == "label:B"
+
+    async def test_resolve_returns_tuple_of_basemodels(self):
+        """resolve_* returning a tuple should traverse children."""
+
+        class Child(BaseModel):
+            name: str
+            label: str = ""
+
+            def resolve_label(self):
+                return f"child:{self.name}"
+
+        class Parent(BaseModel):
+            children: tuple[Child, ...] = ()
+
+            def resolve_children(self):
+                return (Child(name="A"), Child(name="B"))
+
+        result = await Resolver().resolve(Parent())
+        assert result.children[0].label == "child:A"
+        assert result.children[1].label == "child:B"
+
+    async def test_resolve_returns_list_with_non_basemodel(self):
+        """Non-BaseModel items in resolve_* result list are skipped."""
+
+        class Child(BaseModel):
+            name: str
+
+        class Parent(BaseModel):
+            items: list = []
+
+            def resolve_items(self):
+                return [Child(name="A"), "skip me", Child(name="B")]
+
+        result = await Resolver().resolve(Parent())
+        assert len(result.items) == 3
+        assert isinstance(result.items[0], Child)
+        assert result.items[1] == "skip me"
+
+    async def test_resolve_with_ancestor_context(self):
+        """resolve_* should receive ancestor_context from parent ExposeAs."""
+
+        from typing import Annotated
+
+        from nexusx.context import ExposeAs
+
+        class Child(BaseModel):
+            name: str
+            parent_prefix: str = ""
+
+            def resolve_parent_prefix(self, ancestor_context=None):
+                if ancestor_context is None:
+                    ancestor_context = {}
+                return ancestor_context.get("prefix", "none")
+
+        class Parent(BaseModel):
+            prefix: Annotated[str, ExposeAs("prefix")]
+            children: list[Child] = []
+
+        parent = Parent(
+            prefix="HELLO",
+            children=[Child(name="A"), Child(name="B")],
+        )
+        result = await Resolver().resolve(parent)
+        assert result.children[0].parent_prefix == "HELLO"
+        assert result.children[1].parent_prefix == "HELLO"

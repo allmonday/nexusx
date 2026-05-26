@@ -1,8 +1,8 @@
-"""DefineSubset + Resolver vs SQLAlchemy selectinload performance benchmark.
+"""DefineSubset + Resolver vs Pydantic DTO performance benchmark.
 
 Compares two approaches for building nested API responses:
   A) nexusx: DefineSubset DTO + Resolver (auto relationship loading + derived fields)
-  B) Raw SQLAlchemy: selectinload + manual dict construction + manual derived fields
+  B) Raw SQLAlchemy + Pydantic DTO: selectinload + manual DTO construction
 
 Scenarios (progressive complexity):
   L1: Pure field selection — no relationships
@@ -310,109 +310,6 @@ async def bench_nexusx_l4():
 
 
 # ──────────────────────────────────────────────────────────
-# Benchmark: Raw SQLAlchemy selectinload
-# ──────────────────────────────────────────────────────────
-
-
-async def bench_raw_l1():
-    """L1: Pure field selection — manual dict."""
-    _, sf = _ensure_engine()
-    stmt = select(User)
-    async with sf() as session:
-        users = (await session.exec(stmt)).all()
-    return [{"id": u.id, "name": u.name} for u in users]
-
-
-async def bench_raw_l2():
-    """L2: Task with selectinload owner."""
-    _, sf = _ensure_engine()
-    stmt = select(Task).options(selectinload(Task.owner))
-    async with sf() as session:
-        tasks = (await session.exec(stmt)).all()
-    return [
-        {
-            "id": t.id,
-            "title": t.title,
-            "sprint_id": t.sprint_id,
-            "owner_id": t.owner_id,
-            "done": t.done,
-            "owner": {"id": t.owner.id, "name": t.owner.name} if t.owner else None,
-        }
-        for t in tasks
-    ]
-
-
-async def bench_raw_l3():
-    """L3: Sprint with tasks → owner + derived fields."""
-    _, sf = _ensure_engine()
-    stmt = select(Sprint).options(
-        selectinload(Sprint.tasks).selectinload(Task.owner)
-    )
-    async with sf() as session:
-        sprints = (await session.exec(stmt)).all()
-    return [
-        {
-            "id": s.id,
-            "name": s.name,
-            "tasks": [
-                {
-                    "id": t.id,
-                    "title": t.title,
-                    "sprint_id": t.sprint_id,
-                    "owner_id": t.owner_id,
-                    "done": t.done,
-                    "owner": (
-                        {"id": t.owner.id, "name": t.owner.name} if t.owner else None
-                    ),
-                }
-                for t in s.tasks
-            ],
-            "task_count": len(s.tasks),
-            "contributor_names": sorted(
-                {t.owner.name for t in s.tasks if t.owner}
-            ),
-        }
-        for s in sprints
-    ]
-
-
-async def bench_raw_l4():
-    """L4: Sprint with tasks → owner + full_title + contributors aggregation."""
-    _, sf = _ensure_engine()
-    stmt = select(Sprint).options(
-        selectinload(Sprint.tasks).selectinload(Task.owner)
-    )
-    async with sf() as session:
-        sprints = (await session.exec(stmt)).all()
-    return [
-        {
-            "id": s.id,
-            "name": s.name,
-            "tasks": [
-                {
-                    "id": t.id,
-                    "title": t.title,
-                    "sprint_id": t.sprint_id,
-                    "owner_id": t.owner_id,
-                    "done": t.done,
-                    "owner": (
-                        {"id": t.owner.id, "name": t.owner.name} if t.owner else None
-                    ),
-                    "full_title": f"{s.name} / {t.title}",
-                }
-                for t in s.tasks
-            ],
-            "contributors": [
-                {"id": t.owner.id, "name": t.owner.name}
-                for t in s.tasks
-                if t.owner
-            ],
-        }
-        for s in sprints
-    ]
-
-
-# ──────────────────────────────────────────────────────────
 # Benchmark: Raw SQLAlchemy selectinload + Pydantic DTO
 # ──────────────────────────────────────────────────────────
 
@@ -525,10 +422,10 @@ N_WARMUP = 5
 N_RUNS = 50
 
 SCENARIOS = [
-    ("L1: Field selection", bench_nexusx_l1, bench_pydantic_l1, bench_raw_l1),
-    ("L2: 1-level relationship", bench_nexusx_l2, bench_pydantic_l2, bench_raw_l2),
-    ("L3: 2-level + derived fields", bench_nexusx_l3, bench_pydantic_l3, bench_raw_l3),
-    ("L4: Cross-layer data flow", bench_nexusx_l4, bench_pydantic_l4, bench_raw_l4),
+    ("L1: Field selection", bench_nexusx_l1, bench_pydantic_l1),
+    ("L2: 1-level relationship", bench_nexusx_l2, bench_pydantic_l2),
+    ("L3: 2-level + derived fields", bench_nexusx_l3, bench_pydantic_l3),
+    ("L4: Cross-layer data flow", bench_nexusx_l4, bench_pydantic_l4),
 ]
 
 SCALES = [
@@ -557,30 +454,21 @@ def print_comparison(
     label: str,
     nexusx_times: list[float],
     pydantic_times: list[float],
-    raw_times: list[float],
 ):
     def _stats(times):
         return mean(times), quantiles(times, n=4)[0], quantiles(times, n=20)[18]
 
     nx_avg, nx_p50, nx_p95 = _stats(nexusx_times)
     pd_avg, pd_p50, pd_p95 = _stats(pydantic_times)
-    raw_avg, raw_p50, raw_p95 = _stats(raw_times)
 
-    pd_overhead = ((pd_avg - raw_avg) / raw_avg) * 100 if raw_avg > 0 else 0
-    nx_overhead = ((nx_avg - raw_avg) / raw_avg) * 100 if raw_avg > 0 else 0
     nx_vs_pd = ((nx_avg - pd_avg) / pd_avg) * 100 if pd_avg > 0 else 0
-    sign_pd = "+" if pd_overhead >= 0 else ""
-    sign_nx = "+" if nx_overhead >= 0 else ""
     sign_vs = "+" if nx_vs_pd >= 0 else ""
 
     print(f"  {label}")
     print(f"  {'Method':<25s} {'Avg':>10s} {'P50':>10s} {'P95':>10s}")
     print(f"  {'─' * 58}")
-    print(f"  {'Raw dict (baseline)':<25s} {fmt_ms(raw_avg):>10s} {fmt_ms(raw_p50):>10s} {fmt_ms(raw_p95):>10s}")
-    print(f"  {'Raw + Pydantic DTO':<25s} {fmt_ms(pd_avg):>10s} {fmt_ms(pd_p50):>10s} {fmt_ms(pd_p95):>10s}")
-    print(f"  {'  vs dict':<25s} {sign_pd}{pd_overhead:.1f}%")
+    print(f"  {'Pydantic DTO':<25s} {fmt_ms(pd_avg):>10s} {fmt_ms(pd_p50):>10s} {fmt_ms(pd_p95):>10s}")
     print(f"  {'nexusx DefineSubset':<25s} {fmt_ms(nx_avg):>10s} {fmt_ms(nx_p50):>10s} {fmt_ms(nx_p95):>10s}")
-    print(f"  {'  vs dict':<25s} {sign_nx}{nx_overhead:.1f}%")
     print(f"  {'  vs Pydantic':<25s} {sign_vs}{nx_vs_pd:.1f}%")
     print()
 
@@ -590,7 +478,7 @@ async def verify_correctness():
     _ensure_resolver()
     _, sf = _ensure_engine()
 
-    # L3: SprintSummary
+    # L3: SprintSummary — compare nexusx vs Pydantic
     stmt = build_dto_select(SprintSummary)
     async with sf() as session:
         rows = (await session.exec(stmt)).all()
@@ -602,28 +490,42 @@ async def verify_correctness():
     )
     async with sf() as session:
         sprints = (await session.exec(stmt_raw)).all()
-    raw_result = [
-        {
-            "id": s.id,
-            "task_count": len(s.tasks),
-            "contributor_names": sorted(
-                {t.owner.name for t in s.tasks if t.owner}
-            ),
-        }
+    pd_result = [
+        PSprintSummary(
+            id=s.id,
+            name=s.name,
+            tasks=[
+                PTaskSummary(
+                    id=t.id,
+                    title=t.title,
+                    sprint_id=t.sprint_id,
+                    owner_id=t.owner_id,
+                    done=t.done,
+                    owner=(
+                        PUserSummary(id=t.owner.id, name=t.owner.name)
+                        if t.owner
+                        else None
+                    ),
+                )
+                for t in s.tasks
+            ],
+            task_count=len(s.tasks),
+            contributor_names=sorted({t.owner.name for t in s.tasks if t.owner}),
+        )
         for s in sprints
     ]
 
     nx_map = {r.id: r for r in nx_result}
-    raw_map = {r["id"]: r for r in raw_result}
+    pd_map = {r.id: r for r in pd_result}
 
-    assert set(nx_map.keys()) == set(raw_map.keys()), "ID mismatch"
+    assert set(nx_map.keys()) == set(pd_map.keys()), "ID mismatch"
     for sid in nx_map:
         nx = nx_map[sid]
-        raw = raw_map[sid]
-        assert nx.task_count == raw["task_count"], (
-            f"Sprint {sid}: task_count mismatch: {nx.task_count} vs {raw['task_count']}"
+        pd = pd_map[sid]
+        assert nx.task_count == pd.task_count, (
+            f"Sprint {sid}: task_count mismatch: {nx.task_count} vs {pd.task_count}"
         )
-        assert nx.contributor_names == raw["contributor_names"], (
+        assert nx.contributor_names == pd.contributor_names, (
             f"Sprint {sid}: contributor_names mismatch"
         )
 
@@ -633,7 +535,7 @@ async def verify_correctness():
 async def main():
     db_label = "MySQL 8.0 (localhost)" if USE_MYSQL else "SQLite in-memory"
     print("=" * 60)
-    print("  DefineSubset + Resolver vs SQLAlchemy selectinload")
+    print("  DefineSubset + Resolver vs Pydantic DTO")
     print(f"  Database: {db_label}")
     print("=" * 60)
     print()
@@ -662,18 +564,16 @@ async def main():
             print("  Verifying result equivalence...")
             await verify_correctness()
 
-        for scenario_name, nexusx_fn, pydantic_fn, raw_fn in SCENARIOS:
+        for scenario_name, nexusx_fn, pydantic_fn in SCENARIOS:
             # Warmup
             await run_bench(nexusx_fn, N_WARMUP)
             await run_bench(pydantic_fn, N_WARMUP)
-            await run_bench(raw_fn, N_WARMUP)
 
             # Measure
             nx_times = await run_bench(nexusx_fn, N_RUNS)
             pd_times = await run_bench(pydantic_fn, N_RUNS)
-            raw_times = await run_bench(raw_fn, N_RUNS)
 
-            print_comparison(scenario_name, nx_times, pd_times, raw_times)
+            print_comparison(scenario_name, nx_times, pd_times)
 
         print()
 

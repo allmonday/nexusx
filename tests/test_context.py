@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from typing import Annotated
 
 from pydantic import BaseModel
@@ -302,3 +303,91 @@ class TestCombinedContext:
 
         assert result.children[0].label == "P:resolved_child"
         assert result.children[1].label == "P:resolved_child"
+
+
+# ──────────────────────────────────────────────────────────
+# Test: BFS edge cases — SendTo multi-collector
+# ──────────────────────────────────────────────────────────
+
+
+class TestSendToMultiCollector:
+    async def test_send_to_multiple_collectors(self):
+        """One field can send to multiple Collectors via SendTo tuple."""
+
+        class Child(BaseModel):
+            name: Annotated[str, SendTo(("names", "all_names"))]
+
+        class Parent(BaseModel):
+            children: list[Child] = []
+            names: list[str] = []
+            all_names: list[str] = []
+
+            def post_names(self, collector=Collector("names")):
+                return collector.values()
+
+            def post_all_names(self, collector=Collector("all_names")):
+                return collector.values()
+
+        parent = Parent(children=[Child(name="Alice"), Child(name="Bob")])
+        result = await Resolver().resolve(parent)
+
+        assert "Alice" in result.names
+        assert "Bob" in result.names
+        assert "Alice" in result.all_names
+        assert "Bob" in result.all_names
+
+
+# ──────────────────────────────────────────────────────────
+# Test: Auto-load + SendTo — verify no duplication
+# ──────────────────────────────────────────────────────────
+
+
+class TestAutoLoadSendTo:
+    @pytest.mark.usefixtures("test_db")
+    async def test_autoload_no_sendto_duplication(self):
+        """Auto-loaded children should not be traversed twice (SendTo values)."""
+        from sqlmodel import select
+
+        from nexusx.loader.registry import ErManager
+        from nexusx.subset import DefineSubset
+        from tests.conftest import (
+            FixtureSprint,
+            FixtureTask,
+            FixtureUser,
+            get_test_session_factory,
+        )
+
+        session_factory = get_test_session_factory()
+        registry = ErManager(
+            entities=[FixtureUser, FixtureSprint, FixtureTask],
+            session_factory=session_factory,
+        )
+
+        class UserDTO(DefineSubset):
+            __subset__ = (FixtureUser, ("id", "name"))
+
+        class TaskDTO(DefineSubset):
+            __subset__ = (FixtureTask, ("id", "title", "owner_id"))
+            owner: UserDTO | None = None
+            title_value: Annotated[str, SendTo("titles")] = ""
+
+            def post_title_value(self):
+                return self.title
+
+        class SprintDTO(DefineSubset):
+            __subset__ = (FixtureSprint, ("id", "name"))
+            tasks: list[TaskDTO] = []
+            titles: list[str] = []
+
+            def post_titles(self, collector=Collector("titles")):
+                return collector.values()
+
+        async with session_factory() as session:
+            sprints = (await session.exec(select(FixtureSprint))).all()
+
+        dtos = [SprintDTO(id=s.id, name=s.name) for s in sprints]
+        result = await Resolver(registry).resolve(dtos)
+
+        # Each sprint has exactly 2 tasks — titles should appear once each
+        assert len(result[0].titles) == 2
+        assert len(result[1].titles) == 2

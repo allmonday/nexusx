@@ -1,5 +1,30 @@
 # Changelog
 
+## 2.5.0
+
+### Refactoring: 依赖清理 — 移除 uvicorn 和 greenlet 默认依赖
+
+`uvicorn`（ASGI 服务器）和 `greenlet`（async/sync 桥接）不再是默认安装依赖。用户按需在项目中自行添加。
+
+**Changes：**
+- `pyproject.toml`: 从 `dependencies` 移除 `uvicorn>=0.41.0` 和 `greenlet>=3.3.2`，两者已在 `dev` 和 `demo` 可选依赖组中覆盖
+
+### Docs: Clean Architecture 框架对比文章
+
+新增 nexusx 与主流 Python 框架（Litestar、Django+DRF、Strawberry、FastAPI+SQLModel、Ariadne、Tartiflette、Temporalio）的 Clean Architecture 对比分析。
+
+**Changes：**
+- 新增 `docs/clean-architecture-comparison.md`
+
+### Chore: Skill 渐进披露重构
+
+将 643 行的 SKILL.md 拆分为多文件按需加载架构，每次调用上下文占用减少 50-75%。踩坑经验重新编号并按阶段归入对应文件。
+
+**Changes：**
+- `skill/SKILL.md`: 重构为轻量入口（概述 + Phase 0 + 调度指令）
+- `skill/phases/phase1.md` ~ `phase4.md`: 各阶段详细指令 + 踩坑经验
+- `skill/spec-management.md`: Spec 管理与工作流
+
 ## 2.4.1
 
 ### Chore: 测试覆盖率提升（+46 测试，678→724）
